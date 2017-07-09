@@ -13,3 +13,17 @@ final Route {
 	+ getPermission()
 	+ getParams()
 }
+
+final Servlet {
+	- static final serialVersionUID
+	- static directory
+	- static routes
+
+	+ static getPath()
+	+ init()
+	# doGet()
+	# doPost()
+	- process()
+	- getRoute()
+	- getMethod()
+}

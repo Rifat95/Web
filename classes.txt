@@ -1,0 +1,15 @@
+final Route {
+	- uri
+	- controller
+	- action
+	- permission
+	- params
+
+	+ Route()
+	+ Route()
+	+ getUri()
+	+ getController()
+	+ getAction()
+	+ getPermission()
+	+ getParams()
+}

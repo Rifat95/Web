@@ -50,3 +50,24 @@ final App {
 	# init()
 	# clean()
 }
+
+final Page {
+	+ static final FULL
+	+ static final VIEW
+	+ static final JSON
+
+	- app
+	- title
+	- view
+	- renderMode
+	- messages
+
+	+ Page()
+	+ setTitle()
+	+ setView()
+	+ setRenderMode()
+	+ addInfo()
+	+ addMessage()
+	+ addWarning()
+	+ send()
+}

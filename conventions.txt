@@ -1,0 +1,15 @@
+indentation: tabs
+continuous indentation: 1 tab
+if/class/method line break: 2 tabs
+brace placement: same line
+
+Javadoc:
+- block comments: full punctuation
+- @tags: first letter in uppercase, without punctuation
+
+class members order:
+- static fields
+- normal fields
+- constructor
+- static methods
+- normal methods (sorted by visibility)

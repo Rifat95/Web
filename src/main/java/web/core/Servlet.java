@@ -18,15 +18,21 @@ import web.util.Util;
 public final class Servlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static String directory;
+	private static String context;
 	private static Route[] routes;
 
 	public static String getPath(String file) {
 		return directory + "/" + file;
 	}
 
+	public static String getUri(String location) {
+		return context + "/" + location;
+	}
+
 	@Override
 	public void init() {
 		directory = getServletContext().getRealPath("/WEB-INF");
+		context = getServletContext().getContextPath();
 
 		try {
 			JSONArray array = (JSONArray) Util.getJson("conf/routes.json");
@@ -62,8 +68,7 @@ public final class Servlet extends HttpServlet {
 	}
 
 	private void process(HttpServletRequest request, HttpServletResponse response) {
-		String uri = request.getRequestURI()
-			.substring(getServletContext().getContextPath().length());
+		String uri = request.getRequestURI().substring(context.length());
 		App app = App.getInstance();
 		app.init(request, response);
 
@@ -110,10 +115,8 @@ public final class Servlet extends HttpServlet {
 	}
 
 	private Route getRoute(String uri) {
-		Matcher m;
-
 		for (Route r : routes) {
-			m = Pattern.compile(r.getUri()).matcher(uri);
+			Matcher m = Pattern.compile(r.getUri()).matcher(uri);
 			if (m.matches()) {
 				int nbParam = m.groupCount();
 				Object[] params = new Object[nbParam];

@@ -17,9 +17,11 @@ final Route {
 final Servlet {
 	- static final serialVersionUID
 	- static directory
+	- static context
 	- static routes
 
 	+ static getPath()
+	+ static getUri()
 	+ init()
 	# doGet()
 	# doPost()

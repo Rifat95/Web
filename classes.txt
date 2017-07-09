@@ -27,3 +27,26 @@ final Servlet {
 	- getRoute()
 	- getMethod()
 }
+
+final App {
+	- static final instance
+	- request
+	- response
+	- session
+	- page
+	- userId
+	- userPermissions
+
+	- App()
+	+ static getInstance()
+	+ getRequest()
+	+ getResponse()
+	+ getSession()
+	+ getSessAttr()
+	+ getPage()
+	+ getUserId()
+	+ setUser()
+	+ access()
+	# init()
+	# clean()
+}

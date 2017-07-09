@@ -71,3 +71,16 @@ final Page {
 	+ addWarning()
 	+ send()
 }
+
+final Message {
+	+ static final INFO
+	+ static final SUCCESS
+	+ static final WARNING
+
+	- type
+	- content
+
+	+ Message()
+	+ getType()
+	+ getContent()
+}

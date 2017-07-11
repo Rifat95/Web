@@ -83,9 +83,11 @@ public final class Servlet extends HttpServlet {
 		app.init(request, response);
 
 		try {
-			if (request.getMethod().equals("POST")
-					&& !request.getParameter("token").equals(app.getSession().getId())) {
-				throw new ForbiddenException();
+			if (request.getMethod().equals("POST")) {
+				String token = request.getParameter("token");
+				if (token == null || !token.equals(request.getSession().getId())) {
+					throw new ForbiddenException();
+				}
 			}
 
 			Route route = getRoute(uri);

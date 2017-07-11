@@ -32,6 +32,22 @@ final Servlet {
 	- getMethod()
 }
 
+final Request {
+	- servletRequest
+
+	+ Request()
+	+ get()
+	+ get()
+}
+
+final Session {
+	- servletSession
+
+	+ Session()
+	+ get()
+	+ get()
+}
+
 final App {
 	- static final instance
 	- request

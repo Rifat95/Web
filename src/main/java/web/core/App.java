@@ -2,7 +2,6 @@ package web.core;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 /**
  * Thread local singleton class
@@ -15,9 +14,9 @@ public final class App {
 		}
 	};
 
-	private HttpServletRequest request;
+	private Request request;
 	private HttpServletResponse response;
-	private HttpSession session;
+	private Session session;
 	private Page page;
 	private int userId;
 	private String[] userPermissions;
@@ -28,7 +27,7 @@ public final class App {
 		return instance.get();
 	}
 
-	public HttpServletRequest getRequest() {
+	public Request getRequest() {
 		return request;
 	}
 
@@ -36,16 +35,8 @@ public final class App {
 		return response;
 	}
 
-	public HttpSession getSession() {
+	public Session getSession() {
 		return session;
-	}
-
-	public Object getSessAttr(String name, Object defaultValue) {
-		if (session.getAttribute(name) == null) {
-			session.setAttribute(name, defaultValue);
-		}
-
-		return session.getAttribute(name);
 	}
 
 	public Page getPage() {
@@ -74,13 +65,13 @@ public final class App {
 	/**
 	 * Must be called at the start of core.Servlet.process() only.
 	 */
-	void init(HttpServletRequest request, HttpServletResponse response) {
-		this.request = request;
-		this.response = response;
-		session = request.getSession();
+	void init(HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
+		request = new Request(servletRequest);
+		response = servletResponse;
+		session = new Session(servletRequest.getSession());
 		page = new Page();
-		userId = (int) getSessAttr("userId", 0);
-		userPermissions = (String[]) getSessAttr("userPermissions", new String[]{"guest"});
+		userId = (int) session.get("userId", 0);
+		userPermissions = (String[]) session.get("userPermissions", new String[]{"guest"});
 	}
 
 	/**

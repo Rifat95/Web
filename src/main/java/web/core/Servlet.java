@@ -1,10 +1,13 @@
 package web.core;
 
+import com.mitchellbosecke.pebble.PebbleEngine;
+import com.mitchellbosecke.pebble.loader.FileLoader;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -20,6 +23,7 @@ public final class Servlet extends HttpServlet {
 	private static String directory;
 	private static String context;
 	private static Route[] routes;
+	private static PebbleEngine engine;
 
 	public static String getPath(String file) {
 		return directory + "/" + file;
@@ -29,16 +33,22 @@ public final class Servlet extends HttpServlet {
 		return context + "/" + location;
 	}
 
+	public static PebbleEngine getEngine() {
+		return engine;
+	}
+
 	@Override
 	public void init() {
-		directory = getServletContext().getRealPath("/WEB-INF");
-		context = getServletContext().getContextPath();
+		ServletContext sc = getServletContext();
+		directory = sc.getRealPath("/WEB-INF");
+		context = sc.getContextPath();
+		engine = new PebbleEngine.Builder().loader(new FileLoader()).build();
 
 		try {
 			JSONArray array = (JSONArray) Util.getJson("conf/routes.json");
 			Iterator<?> it = array.iterator();
 			routes = new Route[array.size()];
-			String pkg = getServletContext().getInitParameter("package") + ".";
+			String pkg = sc.getInitParameter("package") + ".";
 
 			int i = 0;
 			while (it.hasNext()) {
@@ -111,6 +121,7 @@ public final class Servlet extends HttpServlet {
 			e.printStackTrace();
 		}
 
+		app.getPage().send();
 		app.clean();
 	}
 

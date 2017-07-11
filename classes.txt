@@ -19,9 +19,11 @@ final Servlet {
 	- static directory
 	- static context
 	- static routes
+	- static engine
 
 	+ static getPath()
 	+ static getUri()
+	+ static getEngine()
 	+ init()
 	# doGet()
 	# doPost()
@@ -85,4 +87,17 @@ final Message {
 	+ Message()
 	+ getType()
 	+ getContent()
+}
+
+final View {
+	+ static final VIEW
+	+ static final ENTITY
+
+	- file
+	- data
+
+	+ View()
+	+ View()
+	+ add()
+	+ toString()
 }

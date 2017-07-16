@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import web.util.ForbiddenException;
+import web.util.JsonObject;
 import web.util.NotFoundException;
 import web.util.RedirectionException;
 import web.util.Util;
@@ -52,11 +53,11 @@ public final class Servlet extends HttpServlet {
 
 			int i = 0;
 			while (it.hasNext()) {
-				JSONObject json = (JSONObject) it.next();
-				String uri = (String) json.get("uri");
-				Class<?> controller = Class.forName(pkg + json.get("controller"));
-				Method action = getMethod((String) json.get("action"), controller);
-				String permission = (String) json.get("permission");
+				JsonObject jo = new JsonObject((JSONObject) it.next());
+				String uri = jo.get("uri");
+				Class<?> controller = Class.forName(pkg + jo.get("controller"));
+				Method action = getMethod(jo.get("action"), controller);
+				String permission = jo.get("permission");
 
 				routes[i] = new Route(uri, controller, action, permission);
 				i++;

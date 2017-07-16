@@ -9,16 +9,16 @@ public final class Route {
 	private String permission;
 	private Object[] params;
 
+	public Route(String uri, Class<?> controller, Method action, String permission) {
+		this(uri, controller, action, permission, null);
+	}
+
 	public Route(String uri, Class<?> controller, Method action, String permission, Object[] params) {
 		this.uri = uri;
 		this.controller = controller;
 		this.action = action;
 		this.permission = permission;
 		this.params = params;
-	}
-
-	public Route(String uri, Class<?> controller, Method action, String permission) {
-		this(uri, controller, action, permission, null);
 	}
 
 	public String getUri() {

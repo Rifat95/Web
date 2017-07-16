@@ -1,7 +1,5 @@
 package web.core;
 
-import com.mitchellbosecke.pebble.PebbleEngine;
-import com.mitchellbosecke.pebble.loader.FileLoader;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Iterator;
@@ -24,7 +22,6 @@ public final class Servlet extends HttpServlet {
 	private static String directory;
 	private static String context;
 	private static Route[] routes;
-	private static PebbleEngine engine;
 
 	public static String getPath(String file) {
 		return directory + "/" + file;
@@ -34,16 +31,11 @@ public final class Servlet extends HttpServlet {
 		return context + "/" + location;
 	}
 
-	public static PebbleEngine getEngine() {
-		return engine;
-	}
-
 	@Override
 	public void init() {
 		ServletContext sc = getServletContext();
 		directory = sc.getRealPath("/WEB-INF");
 		context = sc.getContextPath();
-		engine = new PebbleEngine.Builder().loader(new FileLoader()).build();
 
 		try {
 			JSONArray array = (JSONArray) Util.getJson("conf/routes.json");

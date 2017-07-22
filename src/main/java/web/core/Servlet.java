@@ -15,7 +15,6 @@ import web.util.ForbiddenException;
 import web.util.JsonObject;
 import web.util.NotFoundException;
 import web.util.RedirectionException;
-import web.util.Util;
 
 public final class Servlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;

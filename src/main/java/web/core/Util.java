@@ -23,14 +23,18 @@ public final class Util {
 
 	public static Object getJson(String file) throws Exception {
 		return new JSONParser()
-			.parse(new InputStreamReader(new FileInputStream(Servlet.getPath(file))));
+			.parse(new InputStreamReader(new FileInputStream(path(file))));
 	}
 
-	public static String uri(String location) {
-		return Servlet.getContext() + "/" + location;
+	public static String path(String file) {
+		return Servlet.getDirectory()+ "/" + file;
 	}
 
-	public static String file(String location) {
-		return uri("public/" + location);
+	public static String uri(String path) {
+		return Servlet.getContext() + "/" + path;
+	}
+
+	public static String file(String path) {
+		return uri("public/" + path);
 	}
 }

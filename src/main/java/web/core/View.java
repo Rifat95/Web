@@ -9,11 +9,11 @@ import web.util.NotFoundException;
 public final class View {
 	public static final String VIEW = "view/";
 	public static final String ENTITY = "entity/";
-
 	private static final PebbleEngine engine = new PebbleEngine.Builder()
 		.loader(new FileLoader())
 		.strictVariables(true)
 		.build();
+
 	private String file;
 	private HashMap<String, Object> data;
 
@@ -22,7 +22,7 @@ public final class View {
 	}
 
 	public View(String name, String type) {
-		file = Servlet.getPath("views/" + type + name + ".tpl");
+		file = Util.path("views/" + type + name + ".tpl");
 		data = new HashMap<>();
 		data.put("u", Util.getInstance());
 	}

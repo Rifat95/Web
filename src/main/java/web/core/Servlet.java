@@ -2,7 +2,9 @@ package web.core;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.servlet.ServletContext;
@@ -22,8 +24,8 @@ public final class Servlet extends HttpServlet {
 	private static String context;
 	private static Route[] routes;
 
-	public static String getPath(String file) {
-		return directory + "/" + file;
+	public static String getDirectory() {
+		return directory;
 	}
 
 	public static String getContext() {

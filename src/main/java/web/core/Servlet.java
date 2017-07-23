@@ -26,8 +26,8 @@ public final class Servlet extends HttpServlet {
 		return directory + "/" + file;
 	}
 
-	public static String getUri(String location) {
-		return context + "/" + location;
+	public static String getContext() {
+		return context;
 	}
 
 	@Override

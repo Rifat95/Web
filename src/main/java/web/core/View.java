@@ -25,6 +25,7 @@ public final class View {
 		file = Util.path("views/" + type + name + ".tpl");
 		data = new HashMap<>();
 		data.put("u", Util.getInstance());
+		data.put("t", App.getInstance().getT());
 	}
 
 	public HashMap<String, Object> getData() {

@@ -26,4 +26,8 @@ public final class Session {
 			return defaultValue;
 		}
 	}
+
+	public void set(String attr, Object value) {
+		servletSession.setAttribute(attr, value);
+	}
 }

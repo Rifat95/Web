@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -23,6 +24,7 @@ public final class Servlet extends HttpServlet {
 	private static String directory;
 	private static String context;
 	private static Route[] routes;
+	private static HashMap<String, ResourceBundle> stringBundles;
 
 	public static String getDirectory() {
 		return directory;
@@ -32,6 +34,10 @@ public final class Servlet extends HttpServlet {
 		return context;
 	}
 
+	public static ResourceBundle getBundle(String language) {
+		return stringBundles.get(language);
+	}
+
 	@Override
 	public void init() {
 		ServletContext sc = getServletContext();
@@ -39,6 +45,7 @@ public final class Servlet extends HttpServlet {
 		context = sc.getContextPath();
 
 		try {
+			// Load routes
 			JSONArray array = (JSONArray) Util.getJson("conf/routes.json");
 			Iterator<?> it = array.iterator();
 			routes = new Route[array.size()];
@@ -54,6 +61,15 @@ public final class Servlet extends HttpServlet {
 
 				routes[i] = new Route(uri, controller, action, permission);
 				i++;
+			}
+
+			// Load strings
+			stringBundles = new HashMap<>();
+			String[] languages = sc.getInitParameter("languages").split(",");
+			ClassLoader cl = sc.getClassLoader();
+
+			for (String lang : languages) {
+				stringBundles.put(lang, ResourceBundle.getBundle("strings", new Locale(lang), cl));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

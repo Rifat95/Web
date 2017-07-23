@@ -20,6 +20,7 @@ public final class App {
 	private Page page;
 	private int userId;
 	private String[] userPermissions;
+	private Translator t;
 
 	private App() {}
 
@@ -47,6 +48,10 @@ public final class App {
 		return userId;
 	}
 
+	public Translator getT() {
+		return t;
+	}
+
 	public void setUser(int id, String[] permissions) {
 		userId = id;
 		userPermissions = permissions;
@@ -72,6 +77,7 @@ public final class App {
 		page = new Page();
 		userId = (int) session.get("userId", 0);
 		userPermissions = (String[]) session.get("userPermissions", new String[]{"guest"});
+		t = new Translator();
 	}
 
 	/**

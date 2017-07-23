@@ -54,10 +54,12 @@ public final class Page {
 	public void send() {
 		HttpServletResponse servletResponse = app.getResponse();
 		String contentType = "text/html;charset=UTF-8";
+		boolean full = renderMode.equals(FULL);
 
-		if (renderMode.equals(FULL)) {
-			response = new View("body", View.ROOT)
+		if (full) {
+			response = new View("body", "")
 				.add("title", title)
+				.add("messages", messages)
 				.add("content", response.toString());
 		} else if (renderMode.equals(JSON)) {
 			contentType = "application/json;charset=UTF-8";
@@ -72,6 +74,10 @@ public final class Page {
 			servletResponse.setCharacterEncoding("UTF-8");
 			servletResponse.setContentType(contentType);
 			servletResponse.getWriter().write(response.toString());
+
+			if (full) {
+				messages.clear();
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

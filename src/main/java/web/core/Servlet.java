@@ -1,5 +1,9 @@
 package web.core;
 
+import com.mitchellbosecke.pebble.PebbleEngine;
+import com.mitchellbosecke.pebble.loader.ServletLoader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -14,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import web.util.ForbiddenException;
 import web.util.JsonObject;
 import web.util.NotFoundException;
@@ -21,17 +26,18 @@ import web.util.RedirectionException;
 
 public final class Servlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private static String directory;
+
 	private static String context;
+	private static PebbleEngine engine;
 	private static Route[] routes;
 	private static HashMap<String, ResourceBundle> stringBundles;
 
-	public static String getDirectory() {
-		return directory;
-	}
-
 	public static String getContext() {
 		return context;
+	}
+
+	public static PebbleEngine getEngine() {
+		return engine;
 	}
 
 	public static ResourceBundle getBundle(String language) {
@@ -41,15 +47,20 @@ public final class Servlet extends HttpServlet {
 	@Override
 	public void init() {
 		ServletContext sc = getServletContext();
-		directory = sc.getRealPath("/WEB-INF");
+		ClassLoader loader = sc.getClassLoader();
 		context = sc.getContextPath();
+		engine = new PebbleEngine.Builder()
+			.loader(new ServletLoader(sc))
+			.strictVariables(true)
+			.build();
 
 		try {
 			// Load routes
-			JSONArray array = (JSONArray) Util.getJson("conf/routes.json");
+			String pkg = sc.getInitParameter("package") + ".";
+			InputStream is = loader.getResourceAsStream("conf/routes.json");
+			JSONArray array = (JSONArray) new JSONParser().parse(new InputStreamReader(is));
 			Iterator<?> it = array.iterator();
 			routes = new Route[array.size()];
-			String pkg = sc.getInitParameter("package") + ".";
 
 			int i = 0;
 			while (it.hasNext()) {
@@ -66,10 +77,9 @@ public final class Servlet extends HttpServlet {
 			// Load strings
 			stringBundles = new HashMap<>();
 			String[] languages = sc.getInitParameter("languages").split(",");
-			ClassLoader cl = sc.getClassLoader();
 
-			for (String lang : languages) {
-				stringBundles.put(lang, ResourceBundle.getBundle("strings", new Locale(lang), cl));
+			for (String s : languages) {
+				stringBundles.put(s, ResourceBundle.getBundle("i18n.strings", new Locale(s), loader));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

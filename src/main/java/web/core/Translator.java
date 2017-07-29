@@ -14,17 +14,20 @@ public final class Translator {
 		formatter = new MessageFormat("", strings.getLocale());
 	}
 
-	public String t(String s) {
-		return strings.getString(s);
+	public String t(String key) {
+		return strings.getString(key);
 	}
 
-	public String t(String s, Object... args) {
-		formatter.applyPattern(strings.getString(s));
+	public String t(String key, Object... args) {
+		formatter.applyPattern(strings.getString(key));
 		return formatter.format(args);
 	}
 
-	public String t(String s, List<Object> l) {
-		return t(s, l.toArray());
+	/**
+	 * For templates only.
+	 */
+	public String t(String key, List<Object> l) {
+		return t(key, l.toArray());
 	}
 
 	public void setLanguage(String language) {

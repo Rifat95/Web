@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServletResponse;
  * Thread local singleton class
  */
 public final class App {
-	private static final ThreadLocal<App> instance = new ThreadLocal<App>() {
+	private static final ThreadLocal<App> INSTANCE = new ThreadLocal<App>() {
 		@Override
 		protected App initialValue() {
 			return new App();
@@ -22,10 +22,11 @@ public final class App {
 	private String[] userPermissions;
 	private Translator t;
 
-	private App() {}
+	private App() {
+	}
 
 	public static App getInstance() {
-		return instance.get();
+		return INSTANCE.get();
 	}
 
 	public Request getRequest() {
@@ -84,6 +85,6 @@ public final class App {
 	 * Must be called at the end of core.Servlet.process() only, to avoid memory leak.
 	 */
 	void clean() {
-		instance.remove();
+		INSTANCE.remove();
 	}
 }

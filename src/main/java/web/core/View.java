@@ -5,6 +5,7 @@ import java.util.HashMap;
 import web.util.NotFoundException;
 
 public final class View {
+	public static final String CORE = "core/";
 	public static final String VIEW = "view/";
 	public static final String ENTITY = "entity/";
 
@@ -16,7 +17,7 @@ public final class View {
 	}
 
 	public View(String name, String type) {
-		file = "/WEB-INF/" + type + name + ".tpl";
+		file = "/WEB-INF/templates/" + type + name + ".tpl";
 		data = new HashMap<>();
 		data.put("u", Util.getInstance());
 		data.put("t", App.getInstance().getT());

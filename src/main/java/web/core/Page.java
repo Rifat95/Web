@@ -54,30 +54,44 @@ public final class Page {
 	public void send() {
 		HttpServletResponse servletResponse = app.getResponse();
 		String contentType = "text/html;charset=UTF-8";
-		boolean full = renderMode.equals(FULL);
+		String output = "";
 
-		if (full) {
-			response = new View("body", "")
+		switch (renderMode) {
+		case FULL:
+			String msgOutput = "";
+			if (!messages.isEmpty()) {
+				msgOutput = new View("messages", View.CORE)
+					.add("messages", messages)
+					.toString();
+
+				messages.clear();
+			}
+
+			output = new View("body", View.CORE)
 				.add("title", title)
-				.add("messages", messages)
-				.add("content", response.toString());
-		} else if (renderMode.equals(JSON)) {
+				.add("messages", msgOutput)
+				.add("content", response.toString())
+				.toString();
+			break;
+		case VIEW:
+			output = response.toString();
+			break;
+		case JSON:
 			contentType = "application/json;charset=UTF-8";
 
 			if (response instanceof View) {
 				View v = (View) response;
-				response = new JsonObject(new JSONObject(v.getData()));
+				output = new JsonObject(new JSONObject(v.getData())).toString();
+			} else {
+				output = response.toString();
 			}
+			break;
 		}
 
 		try {
 			servletResponse.setCharacterEncoding("UTF-8");
 			servletResponse.setContentType(contentType);
-			servletResponse.getWriter().write(response.toString());
-
-			if (full) {
-				messages.clear();
-			}
+			servletResponse.getWriter().write(output);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

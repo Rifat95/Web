@@ -32,7 +32,6 @@ public final class Translator {
 
 	public void setLanguage(String language) {
 		ResourceBundle bundle = Servlet.getBundle(language);
-
 		if (bundle != null) {
 			App.getInstance().getSession().set("language", language);
 			strings = bundle;

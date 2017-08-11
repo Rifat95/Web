@@ -63,7 +63,6 @@ public final class Page {
 				msgOutput = new View("messages", View.CORE)
 					.add("messages", messages)
 					.toString();
-
 				messages.clear();
 			}
 

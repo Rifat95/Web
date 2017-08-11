@@ -3,6 +3,7 @@ package web.core;
 import java.io.StringWriter;
 import java.util.HashMap;
 import web.util.NotFoundException;
+import web.util.Util;
 
 public final class View {
 	public static final String CORE = "core/";
@@ -19,12 +20,15 @@ public final class View {
 	public View(String name, String type) {
 		file = "/WEB-INF/templates/" + type + name + ".tpl";
 		data = new HashMap<>();
-		data.put("u", Util.getInstance());
-		data.put("t", App.getInstance().getT());
 	}
 
 	public HashMap<String, Object> getData() {
 		return data;
+	}
+
+	public View setData(HashMap<String, Object> map) {
+		data = map;
+		return this;
 	}
 
 	public View add(String var, Object value) {
@@ -34,6 +38,9 @@ public final class View {
 
 	@Override
 	public String toString() {
+		data.put("u", Util.getInstance());
+		data.put("t", App.getInstance().getT());
+
 		try {
 			StringWriter sw = new StringWriter();
 			Servlet.getEngine().getTemplate(file).evaluate(sw, data);

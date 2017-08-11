@@ -18,7 +18,6 @@ public final class Session {
 
 	public Object get(String attr, Object defaultValue) {
 		Object sessionAttr = servletSession.getAttribute(attr);
-
 		if (sessionAttr != null) {
 			return sessionAttr;
 		} else {

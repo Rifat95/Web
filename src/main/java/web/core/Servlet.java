@@ -27,13 +27,13 @@ import web.util.RedirectionException;
 public final class Servlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-	private static String context;
+	private static String webContext;
 	private static PebbleEngine engine;
 	private static Route[] routes;
-	private static HashMap<String, ResourceBundle> stringBundles;
+	private static HashMap<String, ResourceBundle> i18nBundles;
 
-	public static String getContext() {
-		return context;
+	public static String getWebContext() {
+		return webContext;
 	}
 
 	public static PebbleEngine getEngine() {
@@ -41,14 +41,14 @@ public final class Servlet extends HttpServlet {
 	}
 
 	public static ResourceBundle getBundle(String language) {
-		return stringBundles.get(language);
+		return i18nBundles.get(language);
 	}
 
 	@Override
 	public void init() {
 		ServletContext sc = getServletContext();
 		ClassLoader loader = sc.getClassLoader();
-		context = sc.getContextPath();
+		webContext = sc.getContextPath();
 		engine = new PebbleEngine.Builder()
 			.loader(new ServletLoader(sc))
 			.strictVariables(true)
@@ -56,7 +56,7 @@ public final class Servlet extends HttpServlet {
 
 		try {
 			// Load routes
-			String pkg = sc.getInitParameter("package") + ".";
+			String pkg = sc.getInitParameter("package") + ".controller.";
 			InputStream is = loader.getResourceAsStream("conf/routes.json");
 			JSONArray array = (JSONArray) new JSONParser().parse(new InputStreamReader(is));
 			Iterator<?> it = array.iterator();
@@ -69,17 +69,15 @@ public final class Servlet extends HttpServlet {
 				Class<?> controller = Class.forName(pkg + jo.get("controller"));
 				Method action = getMethod(jo.get("action"), controller);
 				String permission = jo.get("permission");
-
 				routes[i] = new Route(uri, controller, action, permission);
 				i++;
 			}
 
 			// Load strings
-			stringBundles = new HashMap<>();
+			i18nBundles = new HashMap<>();
 			String[] languages = sc.getInitParameter("languages").split(",");
-
-			for (String s : languages) {
-				stringBundles.put(s, ResourceBundle.getBundle("i18n.strings", new Locale(s), loader));
+			for (String lang : languages) {
+				i18nBundles.put(lang, ResourceBundle.getBundle("i18n.strings", new Locale(lang), loader));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -98,7 +96,7 @@ public final class Servlet extends HttpServlet {
 	}
 
 	private void process(HttpServletRequest request, HttpServletResponse response) {
-		String uri = request.getRequestURI().substring(context.length());
+		String uri = request.getRequestURI().substring(webContext.length());
 		App app = App.getInstance();
 		app.init(request, response);
 

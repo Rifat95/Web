@@ -2,8 +2,11 @@ indentation: tabs
 continuous indentation: 1 tab
 if/class/method line break: 2 tabs
 brace placement: same line
+html/css: file-case, simple quotes
+less variables: snake_case
+javascript: camelCase, simple quotes
 
-Javadoc:
+javadoc:
 - block comments: full punctuation
 - @tags: first letter in uppercase, without punctuation
 

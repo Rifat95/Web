@@ -8,7 +8,8 @@ javascript: camelCase, simple quotes
 
 javadoc:
 - block comments: full punctuation
-- @tags: first letter in uppercase, without punctuation
+- single line: first letter in uppercase, without punctuation
+- @tags: lowercase, without punctuation
 
 class members order:
 - static fields

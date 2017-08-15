@@ -2,9 +2,7 @@ package web.core;
 
 import javax.servlet.http.HttpSession;
 
-/**
- * HttpSession wrapper class
- */
+// HttpSession wrapper class
 public final class Session {
 	private HttpSession servletSession;
 

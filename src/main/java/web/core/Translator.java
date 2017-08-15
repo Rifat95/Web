@@ -23,9 +23,7 @@ public final class Translator {
 		return formatter.format(args);
 	}
 
-	/**
-	 * For templates only.
-	 */
+	// For templates only
 	public String t(String key, List<Object> l) {
 		return t(key, l.toArray());
 	}

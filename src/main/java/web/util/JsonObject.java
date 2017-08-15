@@ -2,9 +2,7 @@ package web.util;
 
 import org.json.simple.JSONObject;
 
-/**
- * JSONObject wrapper class
- */
+// JSONObject wrapper class
 public final class JsonObject {
 	private JSONObject jo;
 

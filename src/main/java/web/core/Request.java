@@ -2,9 +2,7 @@ package web.core;
 
 import javax.servlet.http.HttpServletRequest;
 
-/**
- * HttpServletRequest wrapper class
- */
+// HttpServletRequest wrapper class
 public final class Request {
 	private HttpServletRequest servletRequest;
 
@@ -13,7 +11,8 @@ public final class Request {
 	}
 
 	public String get(String param) {
-		return servletRequest.getParameter(param);
+		String requestParam = servletRequest.getParameter(param);
+		return requestParam != null ? requestParam : "";
 	}
 
 	public String get(String param, String defaultValue) {

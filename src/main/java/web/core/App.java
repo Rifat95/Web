@@ -1,5 +1,7 @@
 package web.core;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -19,6 +21,7 @@ public final class App {
 	private int userId;
 	private String[] userPermissions;
 	private Translator t;
+	private Connection connection;
 
 	private App() {
 	}
@@ -49,6 +52,14 @@ public final class App {
 
 	public Translator getT() {
 		return t;
+	}
+
+	public Connection getConnection() {
+		return connection;
+	}
+
+	public void setConnection(Connection c) {
+		connection = c;
 	}
 
 	public void setUser(int id, String[] permissions) {
@@ -83,6 +94,14 @@ public final class App {
 	 * Must be called at the end of core.Servlet.process() only, to avoid memory leak.
 	 */
 	void clean() {
+		if (connection != null) {
+			try {
+				connection.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+
 		INSTANCE.remove();
 	}
 }

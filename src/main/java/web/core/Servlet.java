@@ -2,6 +2,8 @@ package web.core;
 
 import com.mitchellbosecke.pebble.PebbleEngine;
 import com.mitchellbosecke.pebble.loader.ServletLoader;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
@@ -9,6 +11,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
+import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -31,6 +34,7 @@ public final class Servlet extends HttpServlet {
 	private static PebbleEngine engine;
 	private static Route[] routes;
 	private static HashMap<String, ResourceBundle> i18nBundles;
+	private static HikariDataSource connectionPool;
 
 	public static String getWebContext() {
 		return webContext;
@@ -79,9 +83,21 @@ public final class Servlet extends HttpServlet {
 			for (String lang : languages) {
 				i18nBundles.put(lang, ResourceBundle.getBundle("i18n.strings", new Locale(lang), loader));
 			}
+
+			// Load database connections
+			Properties dbInfos = new Properties();
+			dbInfos.load(loader.getResourceAsStream("conf/db.properties"));
+			connectionPool = new HikariDataSource(new HikariConfig(dbInfos));
 		} catch (Exception e) {
 			e.printStackTrace();
 			// Fatal error
+		}
+	}
+
+	@Override
+	public void destroy() {
+		if (connectionPool != null) {
+			connectionPool.close();
 		}
 	}
 
@@ -99,6 +115,7 @@ public final class Servlet extends HttpServlet {
 		String uri = request.getRequestURI().substring(webContext.length());
 		App app = App.getInstance();
 		app.init(request, response);
+		Page page = app.getPage();
 
 		try {
 			if (request.getMethod().equals("POST")) {
@@ -114,6 +131,7 @@ public final class Servlet extends HttpServlet {
 				throw new ForbiddenException();
 			}
 
+			app.setConnection(connectionPool.getConnection());
 			Object controller = route.getController().newInstance();
 			route.getAction().invoke(controller, route.getParams());
 		} catch (NotFoundException e) {
@@ -139,10 +157,10 @@ public final class Servlet extends HttpServlet {
 		} catch (Exception e) {
 			// Error 500
 			e.printStackTrace();
+		} finally {
+			page.send();
+			app.clean();
 		}
-
-		app.getPage().send();
-		app.clean();
 	}
 
 	private Route getRoute(String uri) {

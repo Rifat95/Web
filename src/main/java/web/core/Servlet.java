@@ -89,8 +89,8 @@ public final class Servlet extends HttpServlet {
 			dbInfos.load(loader.getResourceAsStream("conf/db.properties"));
 			connectionPool = new HikariDataSource(new HikariConfig(dbInfos));
 		} catch (Exception e) {
-			e.printStackTrace();
 			// Fatal error
+			e.printStackTrace();
 		}
 	}
 
@@ -151,7 +151,7 @@ public final class Servlet extends HttpServlet {
 				// Redirection
 				e.printStackTrace();
 			} else {
-				// Error 500
+				// Error 500 - ServerException
 				e.printStackTrace();
 			}
 		} catch (Exception e) {

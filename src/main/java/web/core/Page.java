@@ -92,7 +92,7 @@ public final class Page {
 			servletResponse.setContentType(contentType);
 			servletResponse.getWriter().write(output);
 		} catch (Exception e) {
-			e.printStackTrace();
+			// Ignore
 		}
 	}
 }

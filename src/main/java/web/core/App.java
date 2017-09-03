@@ -98,7 +98,7 @@ public final class App {
 			try {
 				connection.close();
 			} catch (SQLException e) {
-				e.printStackTrace();
+				// Ignore
 			}
 		}
 

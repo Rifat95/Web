@@ -2,7 +2,7 @@ package web.core;
 
 import java.io.StringWriter;
 import java.util.HashMap;
-import web.util.NotFoundException;
+import web.util.ServerException;
 import web.util.Util;
 
 public final class View {
@@ -46,8 +46,7 @@ public final class View {
 			Servlet.getEngine().getTemplate(file).evaluate(sw, data);
 			return sw.toString();
 		} catch (Exception e) {
-			e.printStackTrace();
-			throw new NotFoundException();
+			throw new ServerException();
 		}
 	}
 }

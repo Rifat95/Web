@@ -5,6 +5,8 @@ brace placement: same line
 html/css: file-case, simple quotes
 less variables: snake_case
 javascript: camelCase, simple quotes
+sql tables: PascalCase
+sql fields: camelCase
 
 javadoc:
 - block comments: full punctuation

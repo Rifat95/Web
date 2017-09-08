@@ -25,4 +25,12 @@ public final class StringMap {
 		data.put(key, value);
 		return this;
 	}
+
+	public boolean contains(String key) {
+		return data.containsKey(key);
+	}
+
+	public boolean isEmpty() {
+		return data.isEmpty();
+	}
 }

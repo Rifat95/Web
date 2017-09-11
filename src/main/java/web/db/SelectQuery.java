@@ -9,6 +9,7 @@ import web.util.NotFoundException;
 import web.util.ServerException;
 
 public final class SelectQuery<E extends Entity<E>> extends Query<E, SelectQuery<E>> {
+	private String fields;
 	private String joins;
 	private String groupBy;
 	private String order;
@@ -16,6 +17,7 @@ public final class SelectQuery<E extends Entity<E>> extends Query<E, SelectQuery
 
 	public SelectQuery(Class<E> entityClass) {
 		super(entityClass);
+		fields = "*";
 		joins = "";
 		groupBy = "";
 		order = "";
@@ -41,6 +43,11 @@ public final class SelectQuery<E extends Entity<E>> extends Query<E, SelectQuery
 				limit = " " + settings.get("limit");
 			}
 		}
+	}
+
+	public SelectQuery<E> setFields(String fields) {
+		this.fields = fields;
+		return this;
 	}
 
 	public SelectQuery<E> addInerJoin(String table, String tableField, String localField) {
@@ -176,9 +183,9 @@ public final class SelectQuery<E extends Entity<E>> extends Query<E, SelectQuery
 		}
 	}
 
-	@Override
-	protected String getSql() {
-		return "SELECT " + fields + " FROM " + table + joins + " WHERE " + conditions
-			+ groupBy + order + limit;
+	private void execute() throws SQLException {
+		prepareStatemment("SELECT " + fields + " FROM " + table + joins + " WHERE " + conditions
+			+ groupBy + order + limit);
+		result = statement.executeQuery();
 	}
 }

@@ -2,7 +2,9 @@ package web.core;
 
 import java.util.HashMap;
 import web.db.DeleteQuery;
+import web.db.InsertQuery;
 import web.db.SelectQuery;
+import web.db.UpdateQuery;
 
 /**
  * Childrens can define a StringMap to alter queries, example:
@@ -63,11 +65,33 @@ public abstract class Entity<T extends Entity<T>> {
 		return instance;
 	}
 
+	public final T save() {
+		if (data.containsKey("id")) {
+			UpdateQuery<T> uQuery = new UpdateQuery<>(instanceClass);
+			data.entrySet().forEach((entry) -> {
+				uQuery.set(entry.getKey(), entry.getValue());
+			});
+
+			uQuery.addCondition("id", "=", data.get("id")).execute();
+		} else {
+			InsertQuery<T> iQuery = new InsertQuery<>(instanceClass);
+			data.entrySet().forEach((entry) -> {
+				iQuery.set(entry.getKey(), entry.getValue());
+			});
+
+			int id = iQuery.execute();
+			data.put("id", id);
+		}
+
+		return instance;
+	}
+
 	public final void delete() {
-		data.clear();
 		new DeleteQuery<>(instanceClass)
 			.addCondition("id", "=", data.get("id"))
 			.execute();
+
+		data.clear();
 	}
 
 	@Override

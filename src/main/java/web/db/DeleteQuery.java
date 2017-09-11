@@ -9,19 +9,14 @@ public final class DeleteQuery<E extends Entity<E>> extends Query<E, DeleteQuery
 		super(entityClass);
 	}
 
-	@Override
 	public void execute() {
 		try {
-			super.execute();
+			prepareStatemment("DELETE FROM " + table + " WHERE " + conditions);
+			statement.executeUpdate();
 		} catch (SQLException e) {
 			throw new ServerException();
 		} finally {
 			clean();
 		}
-	}
-
-	@Override
-	protected String getSql() {
-		return "DELETE FROM " + table + " WHERE " + conditions;
 	}
 }

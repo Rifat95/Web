@@ -3,6 +3,7 @@ package web.db;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import web.core.App;
 import web.core.Entity;
@@ -16,9 +17,8 @@ public abstract class Query<E extends Entity<E>, T extends Query<E, T>> {
 	protected Class<E> entityClass;
 	protected StringMap settings;
 	protected String table;
-	protected String fields;
 	protected String conditions;
-	protected ArrayList<Object> conditionValues;
+	protected ArrayList<Object> values;
 	protected PreparedStatement statement;
 	protected ResultSet result;
 
@@ -28,9 +28,8 @@ public abstract class Query<E extends Entity<E>, T extends Query<E, T>> {
 	public Query(Class<E> entityClass) {
 		this.entityClass = entityClass;
 		table = entityClass.getSimpleName();
-		fields = "*";
 		conditions = "1 = 1";
-		conditionValues = new ArrayList<>();
+		values = new ArrayList<>();
 		instance = (T) this;
 
 		try {
@@ -43,15 +42,31 @@ public abstract class Query<E extends Entity<E>, T extends Query<E, T>> {
 		}
 	}
 
-	public final T setFields(String fields) {
-		this.fields = fields;
+	public final T addCondition(String field, String comparator, Object value) {
+		conditions += " AND " + field + " " + comparator + " ?";
+		values.add(value);
 		return instance;
 	}
 
-	public final T addCondition(String field, String comparator, Object value) {
-		conditions += " AND " + field + " " + comparator + " ?";
-		conditionValues.add(value);
-		return instance;
+	protected final void prepareStatemment(String sql) throws SQLException {
+		statement = App.getInstance().getConnection().prepareStatement(sql);
+
+		int i = 1;
+		for (Object value : values) {
+			statement.setObject(i, value);
+			i++;
+		}
+	}
+
+	protected final void prepareStatemmentWithKeys(String sql) throws SQLException {
+		statement = App.getInstance().getConnection()
+			.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+
+		int i = 1;
+		for (Object value : values) {
+			statement.setObject(i, value);
+			i++;
+		}
 	}
 
 	protected final void clean() {
@@ -60,6 +75,8 @@ public abstract class Query<E extends Entity<E>, T extends Query<E, T>> {
 				result.close();
 			} catch (SQLException e) {
 				// Ignore
+			} finally {
+				result = null;
 			}
 		}
 
@@ -68,28 +85,9 @@ public abstract class Query<E extends Entity<E>, T extends Query<E, T>> {
 				statement.close();
 			} catch (SQLException e) {
 				// Ignore
+			} finally {
+				statement = null;
 			}
 		}
 	}
-
-	/**
-	 * The clean() method is not called here because classes like SelectQuery needs the ResultSet
-	 * after the execution of the statement. Childrens must call the clean() method manually.
-	 *
-	 * @throws SQLException
-	 */
-	protected void execute() throws SQLException {
-		String sql = getSql();
-		statement = App.getInstance().getConnection().prepareStatement(sql);
-
-		int i = 1;
-		for (Object value : conditionValues) {
-			statement.setObject(i, value);
-			i++;
-		}
-
-		result = statement.executeQuery();
-	}
-
-	protected abstract String getSql();
 }

@@ -24,7 +24,6 @@ public abstract class Entity<T extends Entity<T>> {
 
 	private T instance;
 	private Class<T> instanceClass;
-	private String template;
 
 	@SuppressWarnings("unchecked")
 	public Entity() {
@@ -35,7 +34,6 @@ public abstract class Entity<T extends Entity<T>> {
 		valid = true;
 		instance = (T) this;
 		instanceClass = (Class<T>) getClass();
-		template = getClass().getSimpleName().toLowerCase();
 	}
 
 	public final Object get(String var) {
@@ -47,14 +45,8 @@ public abstract class Entity<T extends Entity<T>> {
 		return instance;
 	}
 
-	public final T setTemplate(String name) {
-		template = name;
-		return instance;
-	}
-
 	public final T fetch(String id) {
-		fetch(Integer.parseInt(id));
-		return instance;
+		return fetch(Integer.parseInt(id));
 	}
 
 	public final T fetch(int id) {
@@ -92,13 +84,5 @@ public abstract class Entity<T extends Entity<T>> {
 			.execute();
 
 		data.clear();
-	}
-
-	@Override
-	public final String toString() {
-		data.put("this", this);
-		return new View(template, View.ENTITY)
-			.setData(data)
-			.toString();
 	}
 }

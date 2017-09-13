@@ -60,13 +60,13 @@ public final class Page {
 		case FULL:
 			String msgOutput = "";
 			if (!messages.isEmpty()) {
-				msgOutput = new View("messages", View.CORE)
+				msgOutput = new View("core/messages")
 					.add("messages", messages)
 					.toString();
 				messages.clear();
 			}
 
-			output = new View("body", View.CORE)
+			output = new View("core/body")
 				.add("title", title)
 				.add("messages", msgOutput)
 				.add("content", response.toString())

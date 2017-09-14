@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import javax.servlet.http.HttpServletResponse;
 import org.json.simple.JSONObject;
 import web.util.JsonObject;
+import web.util.Util;
 
 public final class Page {
 	private App app;
@@ -32,6 +33,11 @@ public final class Page {
 		renderMode = "json"; // Override render mode because json can't be displayed as html
 	}
 
+	public void setRedirection(String location) {
+		response = location;
+		renderMode = "redirection";
+	}
+
 	public void addInfo(String msg) {
 		messages.add(new Message(Message.INFO, msg));
 	}
@@ -51,6 +57,7 @@ public final class Page {
 		HttpServletResponse servletResponse = app.getResponse();
 		String contentType = "text/html;charset=UTF-8";
 		String output = "";
+		boolean redirect = false;
 
 		switch (renderMode) {
 		case "full":
@@ -81,12 +88,20 @@ public final class Page {
 				output = response.toString();
 			}
 			break;
+		case "redirection":
+			output = Util.uri(response.toString());
+			redirect = true;
+			break;
 		}
 
 		try {
-			servletResponse.setCharacterEncoding("UTF-8");
-			servletResponse.setContentType(contentType);
-			servletResponse.getWriter().write(output);
+			if (redirect) {
+				servletResponse.sendRedirect(output);
+			} else {
+				servletResponse.setCharacterEncoding("UTF-8");
+				servletResponse.setContentType(contentType);
+				servletResponse.getWriter().write(output);
+			}
 		} catch (Exception e) {
 			// Ignore
 		}

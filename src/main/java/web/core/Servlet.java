@@ -90,7 +90,7 @@ public final class Servlet extends HttpServlet {
 			connectionPool = new HikariDataSource(new HikariConfig(dbInfos));
 		} catch (Exception e) {
 			// Fatal error
-			e.printStackTrace();
+			System.exit(-1);
 		}
 	}
 
@@ -115,6 +115,7 @@ public final class Servlet extends HttpServlet {
 		String uri = request.getRequestURI().substring(webContext.length());
 		App app = App.getInstance();
 		app.init(request, response);
+		Translator t = app.getT();
 		Page page = app.getPage();
 
 		try {
@@ -127,36 +128,28 @@ public final class Servlet extends HttpServlet {
 
 			Route route = getRoute(uri);
 			if (!app.access(route.getPermission())) {
-				//...
 				throw new ForbiddenException();
 			}
 
 			app.setConnection(connectionPool.getConnection());
 			Object controller = route.getController().newInstance();
 			route.getAction().invoke(controller, route.getParams());
-		} catch (NotFoundException e) {
-			// Error 404
-			e.printStackTrace();
 		} catch (ForbiddenException e) {
-			// Error 403
-			e.printStackTrace();
-		} catch (RedirectionException e) {
-			// Redirection
-			e.printStackTrace();
+			page.setTitle(t.t("title.error", 403));
+			page.setView(new View("error-403"));
 		} catch (InvocationTargetException e) {
 			if (e.getCause() instanceof NotFoundException) {
-				// Error 404
-				e.printStackTrace();
+				page.setTitle(t.t("title.error", 404));
+				page.setView(new View("error-404"));
 			} else if (e.getCause() instanceof RedirectionException) {
-				// Redirection
-				e.printStackTrace();
+				page.setRedirection(e.getMessage());
 			} else {
-				// Error 500 - ServerException
-				e.printStackTrace();
+				page.setTitle(t.t("title.error", 500));
+				page.setView(new View("error-500"));
 			}
 		} catch (Exception e) {
-			// Error 500
-			e.printStackTrace();
+			page.setTitle(t.t("title.error", 500));
+			page.setView(new View("error-500"));
 		} finally {
 			page.send();
 			app.clean();

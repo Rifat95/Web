@@ -6,10 +6,6 @@ import org.json.simple.JSONObject;
 import web.util.JsonObject;
 
 public final class Page {
-	public static final String FULL = "full";
-	public static final String VIEW = "view";
-	public static final String JSON = "json";
-
 	private App app;
 	private String title;
 	private Object response;
@@ -19,7 +15,7 @@ public final class Page {
 	@SuppressWarnings("unchecked")
 	public Page() {
 		app = App.getInstance();
-		renderMode = app.getRequest().get("rm", FULL);
+		renderMode = app.getRequest().get("rm", "full");
 		messages = (ArrayList<Message>) app.getSession().get("messages", new ArrayList<>());
 	}
 
@@ -33,7 +29,7 @@ public final class Page {
 
 	public void setJson(JsonObject jo) {
 		response = jo;
-		renderMode = JSON; // Override render mode because json can't be displayed as html
+		renderMode = "json"; // Override render mode because json can't be displayed as html
 	}
 
 	public void addInfo(String msg) {
@@ -57,7 +53,7 @@ public final class Page {
 		String output = "";
 
 		switch (renderMode) {
-		case FULL:
+		case "full":
 			String msgOutput = "";
 			if (!messages.isEmpty()) {
 				msgOutput = new View("core/messages")
@@ -72,15 +68,15 @@ public final class Page {
 				.add("content", response.toString())
 				.toString();
 			break;
-		case VIEW:
+		case "view":
 			output = response.toString();
 			break;
-		case JSON:
+		case "json":
 			contentType = "application/json;charset=UTF-8";
 
 			if (response instanceof View) {
 				View v = (View) response;
-				output = new JsonObject(new JSONObject(v.getData())).toString();
+				output = new JSONObject(v.getData()).toJSONString();
 			} else {
 				output = response.toString();
 			}

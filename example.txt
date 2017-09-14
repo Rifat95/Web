@@ -1,0 +1,38 @@
+webapp
+	WEB-INF
+		web.xml
+		less
+			style.less
+			...less
+		templates
+			core
+				body.tpl
+				messages.tpl
+				error-403.tpl
+				error-404.tpl
+				error-500.tpl
+				...tpl
+			...tpl
+	public
+		css
+			style.css
+			...css
+		files
+			...jpg
+			...png
+			...pdf
+		js
+			...js
+
+src
+	resources
+		conf
+			db.properties
+			routes.json
+		i18n
+			strings_fr.properties
+	package
+		controller
+			...java
+		entity
+			...java

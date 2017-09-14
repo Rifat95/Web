@@ -85,4 +85,11 @@ public abstract class Entity<T extends Entity<T>> {
 
 		data.clear();
 	}
+
+	/**
+	 * This method is called by SelectQuery after data insertion in entity, childrens can override
+	 * it to alter data.
+	 */
+	public void init() {
+	}
 }

@@ -117,6 +117,8 @@ public final class SelectQuery<E extends Entity<E>> extends Query<E, SelectQuery
 				for (int i = 1; i <= nbColumn; i++) {
 					entity.set(meta.getColumnName(i), result.getObject(i));
 				}
+
+				entity.init();
 			}
 		} catch (Exception e) {
 			throw new ServerException();
@@ -145,6 +147,7 @@ public final class SelectQuery<E extends Entity<E>> extends Query<E, SelectQuery
 					entity.set(meta.getColumnName(i), result.getObject(i));
 				}
 
+				entity.init();
 				entities.add(entity);
 			}
 		} catch (Exception e) {

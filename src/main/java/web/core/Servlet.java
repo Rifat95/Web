@@ -115,7 +115,6 @@ public final class Servlet extends HttpServlet {
 		String uri = request.getRequestURI().substring(webContext.length());
 		App app = App.getInstance();
 		app.init(request, response);
-		Translator t = app.getT();
 		Page page = app.getPage();
 
 		try {
@@ -126,7 +125,7 @@ public final class Servlet extends HttpServlet {
 				}
 			}
 
-			Route route = getRoute(uri);
+			Route route = getRoute(uri); // Throw NotFoundException
 			if (!app.access(route.getPermission())) {
 				throw new ForbiddenException();
 			}
@@ -135,21 +134,19 @@ public final class Servlet extends HttpServlet {
 			Object controller = route.getController().newInstance();
 			route.getAction().invoke(controller, route.getParams());
 		} catch (ForbiddenException e) {
-			page.setTitle(t.t("title.error", 403));
-			page.setView(new View("error-403"));
+			setError(app, response, 403);
+		} catch (NotFoundException e) {
+			setError(app, response, 404);
 		} catch (InvocationTargetException e) {
 			if (e.getCause() instanceof NotFoundException) {
-				page.setTitle(t.t("title.error", 404));
-				page.setView(new View("error-404"));
+				setError(app, response, 404);
 			} else if (e.getCause() instanceof RedirectionException) {
 				page.setRedirection(e.getMessage());
 			} else {
-				page.setTitle(t.t("title.error", 500));
-				page.setView(new View("error-500"));
+				setError(app, response, 500);
 			}
 		} catch (Exception e) {
-			page.setTitle(t.t("title.error", 500));
-			page.setView(new View("error-500"));
+			setError(app, response, 500);
 		} finally {
 			page.send();
 			app.clean();
@@ -172,6 +169,13 @@ public final class Servlet extends HttpServlet {
 		}
 
 		throw new NotFoundException();
+	}
+
+	private void setError(App app, HttpServletResponse response, int code) {
+		Page p = app.getPage();
+		p.setTitle(app.getT().t("core.error", code));
+		p.setView(new View("core/error-" + code));
+		response.setStatus(code);
 	}
 
 	private Method getMethod(String name, Class<?> c) throws NoSuchMethodException {

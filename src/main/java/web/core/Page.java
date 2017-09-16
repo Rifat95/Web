@@ -34,7 +34,7 @@ public final class Page {
 	}
 
 	public void setRedirection(String location) {
-		response = location;
+		response = location.startsWith("http") ? location : Util.uri(location);
 		renderMode = "redirection";
 	}
 
@@ -89,7 +89,7 @@ public final class Page {
 			}
 			break;
 		case "redirection":
-			output = Util.uri(response.toString());
+			output = response.toString();
 			redirect = true;
 			break;
 		}

@@ -1,5 +1,6 @@
 package web.core;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import javax.servlet.http.HttpServletResponse;
 import org.json.simple.JSONObject;
@@ -102,7 +103,7 @@ public final class Page {
 				servletResponse.setContentType(contentType);
 				servletResponse.getWriter().write(output);
 			}
-		} catch (Exception e) {
+		} catch (IOException e) {
 			// Ignore
 		}
 	}

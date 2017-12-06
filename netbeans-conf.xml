@@ -1,3 +1,4 @@
+<!-- Rename this file in nb-configuration.xml -->
 <?xml version="1.0" encoding="UTF-8"?>
 <project-shared-configuration>
 	<libraries xmlns="http://www.netbeans.org/ns/cdnjs-libraries/1"/>

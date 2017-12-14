@@ -23,7 +23,7 @@ public final class Translator {
 		return formatter.format(args);
 	}
 
-	// For templates only
+	// For Pebble templates only, example of use: t.t("str", ["arg1", "arg2"])
 	public String t(String key, List<Object> l) {
 		return t(key, l.toArray());
 	}

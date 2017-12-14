@@ -11,7 +11,7 @@ import web.util.StringMap;
 
 /**
  * @param <E> the entity type
- * @param <T> the query type (for method chaining)
+ * @param <T> the query type, for method chaining
  */
 public abstract class Query<E extends Entity<E>, T extends Query<E, T>> {
 	protected Class<E> entityClass;

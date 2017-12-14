@@ -6,10 +6,9 @@ import web.core.Servlet;
 public final class Util {
 	private static final Util INSTANCE = new Util();
 
-	private Util() {
-	}
+	private Util() {}
 
-	// For templates only
+	// To pass the class instance to templates
 	public static Util getInstance() {
 		return INSTANCE;
 	}

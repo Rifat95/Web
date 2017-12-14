@@ -33,6 +33,7 @@ public final class InsertQuery<E extends Entity<E>> extends Query<E, InsertQuery
 			prepareStatemmentWithKeys("INSERT INTO " + table + "("
 				+ fields.substring(0, fields.length() - 2) + ") VALUES ("
 				+ markups.substring(0, markups.length() - 2) + ")");
+
 			statement.executeUpdate();
 			result = statement.getGeneratedKeys();
 

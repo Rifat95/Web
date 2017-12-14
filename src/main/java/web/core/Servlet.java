@@ -73,6 +73,7 @@ public final class Servlet extends HttpServlet {
 				Class<?> controller = Class.forName(pkg + jo.get("controller"));
 				Method action = getMethod(jo.get("action"), controller);
 				String permission = jo.get("permission");
+
 				routes[i] = new Route(uri, controller, action, permission);
 				i++;
 			}
@@ -125,7 +126,7 @@ public final class Servlet extends HttpServlet {
 				}
 			}
 
-			Route route = getRoute(uri); // Throw NotFoundException
+			Route route = getRoute(uri); // Throw web.util.NotFoundException
 			if (!app.access(route.getPermission())) {
 				throw new ForbiddenException();
 			}
@@ -159,12 +160,12 @@ public final class Servlet extends HttpServlet {
 			if (m.matches()) {
 				int nbParam = m.groupCount();
 				Object[] params = new Object[nbParam];
+
 				for (int i = 1; i <= nbParam; i++) {
 					params[i - 1] = m.group(i);
 				}
 
-				return new Route(r.getUri(), r.getController(), r.getAction(),
-					r.getPermission(), params);
+				return new Route(r.getUri(), r.getController(), r.getAction(), r.getPermission(), params);
 			}
 		}
 

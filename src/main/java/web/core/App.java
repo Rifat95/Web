@@ -23,8 +23,7 @@ public final class App {
 	private Translator t;
 	private Connection connection;
 
-	private App() {
-	}
+	private App() {}
 
 	public static App getInstance() {
 		return INSTANCE.get();

@@ -51,20 +51,20 @@ public final class SelectQuery<E extends Entity<E>> extends Query<E, SelectQuery
 	}
 
 	public SelectQuery<E> addInerJoin(String table, String tableField, String localField) {
-		joins += " INNER JOIN " + table
-			+ " ON " + table + "." + tableField + " = " + this.table + "." + localField;
+		joins += " INNER JOIN " + table + " ON " + table + "." + tableField + " = " + this.table
+			+ "." + localField;
 		return this;
 	}
 
 	public SelectQuery<E> addLeftJoin(String table, String tableField, String localField) {
-		joins += " LEFT JOIN " + table
-			+ " ON " + table + "." + tableField + " = " + this.table + "." + localField;
+		joins += " LEFT JOIN " + table + " ON " + table + "." + tableField + " = " + this.table
+			+ "." + localField;
 		return this;
 	}
 
 	public SelectQuery<E> addRightJoin(String table, String tableField, String localField) {
-		joins += " RIGHT JOIN " + table
-			+ " ON " + table + "." + tableField + " = " + this.table + "." + localField;
+		joins += " RIGHT JOIN " + table + " ON " + table + "." + tableField + " = " + this.table
+			+ "." + localField;
 		return this;
 	}
 
@@ -189,6 +189,7 @@ public final class SelectQuery<E extends Entity<E>> extends Query<E, SelectQuery
 	private void execute() throws SQLException {
 		prepareStatemment("SELECT " + fields + " FROM " + table + joins + " WHERE " + conditions
 			+ groupBy + order + limit);
+
 		result = statement.executeQuery();
 	}
 }

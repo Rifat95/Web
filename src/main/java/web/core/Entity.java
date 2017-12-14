@@ -9,11 +9,11 @@ import web.db.UpdateQuery;
 /**
  * Childrens can define a StringMap to alter queries, example:
  * public static final StringMap SETTINGS = new StringMap()
- * .put("conditions", "WHERE status = 'published' AND amount > 0")
- * .put("joins", "LEFT JOIN User ON User.id = EntityX.authorId")
- * .put("order", "EntityX.releaseDate DESC");
+ *   .put("conditions", "WHERE status = 'published' AND amount > 0")
+ *   .put("joins", "LEFT JOIN User ON User.id = EntityX.authorId")
+ *   .put("order", "EntityX.releaseDate DESC");
  *
- * @param <T> the entity type (for method chaining)
+ * @param <T> the entity type, for method chaining
  */
 public abstract class Entity<T extends Entity<T>> {
 	protected App app;
@@ -90,6 +90,5 @@ public abstract class Entity<T extends Entity<T>> {
 	 * This method is called by SelectQuery after data insertion in entity, childrens can override
 	 * it to alter data.
 	 */
-	public void init() {
-	}
+	public void init() {}
 }

@@ -34,6 +34,12 @@ public final class Page {
 		renderMode = "json"; // Override render mode because json can't be displayed as html
 	}
 
+	/**
+	 * Must be called from core.Servlet.process() only, RedirectionException should be used for
+	 * redirection to make sure that no code will be executed after the redirection.
+	 *
+	 * @param location The absolute URI or URL
+	 */
 	public void setRedirection(String location) {
 		response = location.startsWith("http") ? location : Util.uri(location);
 		renderMode = "redirection";
@@ -67,6 +73,7 @@ public final class Page {
 				msgOutput = new View("core/messages")
 					.add("messages", messages)
 					.toString();
+
 				messages.clear();
 			}
 

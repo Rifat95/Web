@@ -30,14 +30,18 @@ import web.util.RedirectionException;
 public final class Servlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-	private static String webContext;
+	private static ServletContext servletContext;
 	private static PebbleEngine engine;
 	private static Route[] routes;
 	private static HashMap<String, ResourceBundle> i18nBundles;
 	private static HikariDataSource connectionPool;
 
+	public static String getInitParam(String name) {
+		return servletContext.getInitParameter(name);
+	}
+
 	public static String getWebContext() {
-		return webContext;
+		return servletContext.getContextPath();
 	}
 
 	public static PebbleEngine getEngine() {
@@ -50,17 +54,17 @@ public final class Servlet extends HttpServlet {
 
 	@Override
 	public void init() {
-		ServletContext sc = getServletContext();
-		ClassLoader loader = sc.getClassLoader();
-		webContext = sc.getContextPath();
+		servletContext = getServletContext();
 		engine = new PebbleEngine.Builder()
-			.loader(new ServletLoader(sc))
+			.loader(new ServletLoader(servletContext))
 			.strictVariables(true)
 			.build();
 
 		try {
+			ClassLoader loader = servletContext.getClassLoader();
+
 			// Load routes
-			String pkg = sc.getInitParameter("package") + ".controller.";
+			String pkg = getInitParam("package") + ".controller.";
 			InputStream is = loader.getResourceAsStream("conf/routes.json");
 			JSONArray array = (JSONArray) new JSONParser().parse(new InputStreamReader(is));
 			Iterator<?> it = array.iterator();
@@ -80,7 +84,7 @@ public final class Servlet extends HttpServlet {
 
 			// Load strings
 			i18nBundles = new HashMap<>();
-			String[] languages = sc.getInitParameter("languages").split(",");
+			String[] languages = getInitParam("languages").split(",");
 			for (String lang : languages) {
 				i18nBundles.put(lang, ResourceBundle.getBundle("i18n.strings", new Locale(lang), loader));
 			}
@@ -113,7 +117,7 @@ public final class Servlet extends HttpServlet {
 	}
 
 	private void process(HttpServletRequest request, HttpServletResponse response) {
-		String uri = request.getRequestURI().substring(webContext.length());
+		String uri = request.getRequestURI().substring(getWebContext().length());
 		App app = App.getInstance();
 		app.init(request, response);
 		Page page = app.getPage();

@@ -145,21 +145,21 @@ web.xml file example
 ### web.core.Servlet.init()
 - Loading and storage of routes
 - Loading and storage of language packs
-- Database connection pool création
+- Database connection pool creation
 
 ### web.core.Servlet.process()
 - URI parsing
 - Verify that a token match the session ID if type of request is post
 - Recuperation of matching route and access check
 - Recuperation of a database connection from the connection pool
-- Instanciation of route's controller and execution of the method with URI arguments (between "/")
+- Instantiation of route's controller and execution of the method with URI arguments (between "/")
 - Send the response to browser with web.core.Page.send()
 - Closing database connection with web.core.App.clean()
 
 ### web.core.App.init()
 - Recuperation of the variable "userId" stored in session (O if not found)
 - Recuperation of the variable "userPermissions" stored in session, ("guest" if not found)
-- Instanciation of web.core.Translator
+- Instantiation of web.core.Translator
 	- Recuperation of the variable "language" stored in session (defaultLanguage if not found)
 	- Recuperation of the associated language pack
 
@@ -169,4 +169,4 @@ web.xml file example
 To connect an user, use the method `web.core.App.setUser(int userId, String[] permissions)`.
 
 ### Access request variables
-To access GET and POST varialbes, use the object `req (web.core.Request)` avalaible in controllers.
+To access GET and POST variables, use the object `req (web.core.Request)` avalaible in controllers.

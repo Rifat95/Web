@@ -28,4 +28,8 @@ public final class Session {
 	public void set(String attr, Object value) {
 		servletSession.setAttribute(attr, value);
 	}
+
+	public void destroy() {
+		servletSession.invalidate();
+	}
 }

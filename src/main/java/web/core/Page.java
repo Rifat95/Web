@@ -38,7 +38,7 @@ public final class Page {
 	 * Must be called from core.Servlet.process() only, RedirectionException should be used for
 	 * redirection to make sure that no code will be executed after the redirection.
 	 *
-	 * @param location The absolute URI or URL
+	 * @param location the absolute URI or URL
 	 */
 	public void setRedirection(String location) {
 		response = location.startsWith("http") ? location : Util.uri(location);

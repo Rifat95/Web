@@ -43,7 +43,7 @@ public abstract class Query<E extends Entity<E>, T extends Query<E, T>> {
 	}
 
 	public final T addCondition(String field, String comparator, Object value) {
-		conditions += " AND " + field + " " + comparator + " ?";
+		conditions += " AND `" + field + "` " + comparator + " ?";
 		values.add(value);
 		return instance;
 	}

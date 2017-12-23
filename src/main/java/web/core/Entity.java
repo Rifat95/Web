@@ -12,61 +12,50 @@ import web.db.UpdateQuery;
  *   .put("conditions", "WHERE status = 'published' AND amount > 0")
  *   .put("joins", "LEFT JOIN User ON User.id = EntityX.authorId")
  *   .put("order", "EntityX.releaseDate DESC");
- *
- * @param <T> the entity type, for method chaining
  */
-public abstract class Entity<T extends Entity<T>> {
+public abstract class Entity {
 	protected App app;
 	protected Page page;
 	protected Translator t;
 	protected HashMap<String, Object> data;
 	protected boolean valid;
 
-	private T instance;
-	private Class<T> instanceClass;
-
-	@SuppressWarnings("unchecked")
 	public Entity() {
 		app = App.getInstance();
 		page = app.getPage();
 		t = app.getT();
 		data = new HashMap<>();
 		valid = true;
-		instance = (T) this;
-		instanceClass = (Class<T>) getClass();
 	}
 
 	public final Object get(String var) {
 		return data.get(var);
 	}
 
-	public final T set(String var, Object value) {
+	public final void set(String var, Object value) {
 		data.put(var, value);
-		return instance;
 	}
 
-	public final T fetch(String id) {
-		return fetch(Integer.parseInt(id));
+	public final void fetch(String id) {
+		fetch(Integer.parseInt(id));
 	}
 
-	public final T fetch(int id) {
-		data = new SelectQuery<>(instanceClass)
+	public final void fetch(int id) {
+		data = new SelectQuery<>(getClass())
 			.addCondition("id", "=", id)
 			.getData();
-
-		return instance;
 	}
 
-	public final T save() {
+	public final void save() {
 		if (data.containsKey("id")) {
-			UpdateQuery<T> uQuery = new UpdateQuery<>(instanceClass);
+			UpdateQuery<?> uQuery = new UpdateQuery<>(getClass());
 			data.entrySet().forEach((entry) -> {
 				uQuery.set(entry.getKey(), entry.getValue());
 			});
 
 			uQuery.addCondition("id", "=", data.get("id")).execute();
 		} else {
-			InsertQuery<T> iQuery = new InsertQuery<>(instanceClass);
+			InsertQuery<?> iQuery = new InsertQuery<>(getClass());
 			data.entrySet().forEach((entry) -> {
 				iQuery.set(entry.getKey(), entry.getValue());
 			});
@@ -74,12 +63,10 @@ public abstract class Entity<T extends Entity<T>> {
 			int id = iQuery.execute();
 			data.put("id", id);
 		}
-
-		return instance;
 	}
 
 	public final void delete() {
-		new DeleteQuery<>(instanceClass)
+		new DeleteQuery<>(getClass())
 			.addCondition("id", "=", data.get("id"))
 			.execute();
 

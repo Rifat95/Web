@@ -4,7 +4,10 @@ import java.sql.SQLException;
 import web.core.Entity;
 import web.util.ServerException;
 
-public final class InsertQuery<E extends Entity<E>> extends Query<E, InsertQuery<E>> {
+/**
+ * @param <E> the entity type
+ */
+public final class InsertQuery<E extends Entity> extends Query<E, InsertQuery<E>> {
 	private String fields;
 	private String markups;
 

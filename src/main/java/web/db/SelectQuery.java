@@ -8,7 +8,10 @@ import web.core.Entity;
 import web.util.NotFoundException;
 import web.util.ServerException;
 
-public final class SelectQuery<E extends Entity<E>> extends Query<E, SelectQuery<E>> {
+/**
+ * @param <E> the entity type
+ */
+public final class SelectQuery<E extends Entity> extends Query<E, SelectQuery<E>> {
 	private String fields;
 	private String joins;
 	private String groupBy;

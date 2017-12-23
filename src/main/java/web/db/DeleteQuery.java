@@ -4,7 +4,10 @@ import java.sql.SQLException;
 import web.core.Entity;
 import web.util.ServerException;
 
-public final class DeleteQuery<E extends Entity<E>> extends Query<E, DeleteQuery<E>> {
+/**
+ * @param <E> the entity type
+ */
+public final class DeleteQuery<E extends Entity> extends Query<E, DeleteQuery<E>> {
 	public DeleteQuery(Class<E> entityClass) {
 		super(entityClass);
 	}

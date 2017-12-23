@@ -4,7 +4,10 @@ import java.sql.SQLException;
 import web.core.Entity;
 import web.util.ServerException;
 
-public final class UpdateQuery<E extends Entity<E>> extends Query<E, UpdateQuery<E>> {
+/**
+ * @param <E> the entity type
+ */
+public final class UpdateQuery<E extends Entity> extends Query<E, UpdateQuery<E>> {
 	private String fields;
 
 	public UpdateQuery(Class<E> entityClass) {

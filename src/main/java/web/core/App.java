@@ -33,10 +33,6 @@ public final class App {
 		return request;
 	}
 
-	public HttpServletResponse getResponse() {
-		return response;
-	}
-
 	public Session getSession() {
 		return session;
 	}
@@ -57,10 +53,6 @@ public final class App {
 		return connection;
 	}
 
-	public void setConnection(Connection c) {
-		connection = c;
-	}
-
 	public void setUser(int id, String[] permissions) {
 		userId = id;
 		userPermissions = permissions;
@@ -76,6 +68,10 @@ public final class App {
 		return false;
 	}
 
+	HttpServletResponse getResponse() {
+		return response;
+	}
+
 	/**
 	 * Must be called at the start of core.Servlet.process() only.
 	 */
@@ -87,6 +83,10 @@ public final class App {
 		userId = (int) session.get("userId", 0);
 		userPermissions = (String[]) session.get("userPermissions", new String[]{"guest"});
 		t = new Translator();
+	}
+
+	void setConnection(Connection c) {
+		connection = c;
 	}
 
 	/**

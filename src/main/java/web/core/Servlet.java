@@ -36,19 +36,19 @@ public final class Servlet extends HttpServlet {
 	private static HashMap<String, ResourceBundle> i18nBundles;
 	private static HikariDataSource connectionPool;
 
-	public static String getInitParam(String name) {
-		return servletContext.getInitParameter(name);
-	}
-
 	public static String getWebContext() {
 		return servletContext.getContextPath();
 	}
 
-	public static PebbleEngine getEngine() {
+	static String getInitParam(String name) {
+		return servletContext.getInitParameter(name);
+	}
+
+	static PebbleEngine getEngine() {
 		return engine;
 	}
 
-	public static ResourceBundle getBundle(String language) {
+	static ResourceBundle getBundle(String language) {
 		return i18nBundles.get(language);
 	}
 

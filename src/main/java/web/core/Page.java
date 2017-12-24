@@ -44,22 +44,14 @@ public final class Page {
 		renderMode = "redirection";
 	}
 
-	public void addInfo(String msg) {
-		messages.add(new Message(Message.INFO, msg));
-	}
-
-	public void addMessage(String msg) {
-		messages.add(new Message(Message.SUCCESS, msg));
-	}
-
-	public void addWarning(String msg) {
-		messages.add(new Message(Message.WARNING, msg));
+	public void addMessage(Message m) {
+		messages.add(m);
 	}
 
 	/**
 	 * Must be called at the end of core.Servlet.process() only.
 	 */
-	public void send() {
+	void send() {
 		HttpServletResponse servletResponse = App.getInstance().getResponse();
 		String contentType = "text/html;charset=UTF-8";
 		String output = "";

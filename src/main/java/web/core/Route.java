@@ -10,11 +10,11 @@ public final class Route {
 	private String[] params;
 	private boolean token;
 
-	public Route(String uri, Class<?> controller, Method action, String permission, boolean token) {
+	Route(String uri, Class<?> controller, Method action, String permission, boolean token) {
 		this(uri, controller, action, permission, token, null);
 	}
 
-	public Route(String uri, Class<?> controller, Method action, String permission, boolean token, String[] params) {
+	Route(String uri, Class<?> controller, Method action, String permission, boolean token, String[] params) {
 		this.uri = uri;
 		this.controller = controller;
 		this.action = action;
@@ -23,27 +23,27 @@ public final class Route {
 		this.params = params;
 	}
 
-	public String getUri() {
+	String getUri() {
 		return uri;
 	}
 
-	public Class<?> getController() {
+	Class<?> getController() {
 		return controller;
 	}
 
-	public Method getAction() {
+	Method getAction() {
 		return action;
 	}
 
-	public String getPermission() {
+	String getPermission() {
 		return permission;
 	}
 
-	public boolean hasToken() {
+	boolean hasToken() {
 		return token;
 	}
 
-	public String[] getParams() {
+	String[] getParams() {
 		return params;
 	}
 }

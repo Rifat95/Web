@@ -8,7 +8,6 @@ import web.util.JsonObject;
 import web.util.Util;
 
 public final class Page {
-	private App app;
 	private String title;
 	private Object response;
 	private String renderMode;
@@ -16,7 +15,7 @@ public final class Page {
 
 	@SuppressWarnings("unchecked")
 	public Page() {
-		app = App.getInstance();
+		App app = App.getInstance();
 		renderMode = app.getRequest().get("rm", "full");
 		messages = (ArrayList<Message>) app.getSession().get("messages", new ArrayList<>());
 	}
@@ -61,7 +60,7 @@ public final class Page {
 	 * Must be called at the end of core.Servlet.process() only.
 	 */
 	public void send() {
-		HttpServletResponse servletResponse = app.getResponse();
+		HttpServletResponse servletResponse = App.getInstance().getResponse();
 		String contentType = "text/html;charset=UTF-8";
 		String output = "";
 		boolean redirect = false;

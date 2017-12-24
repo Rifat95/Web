@@ -130,13 +130,15 @@ routes.json example
 		"uri": "/",
 		"controller": "Home",
 		"action": "show",
-		"permission": "guest"
+		"permission": "guest",
+		"token": false
 	},
 	{
 		"uri": "/news/([0-9]+)/([a-z0-9-]+)",
 		"controller": "News",
 		"action": "show",
-		"permission": "member"
+		"permission": "member",
+		"token": false
 	}
 ]
 ```

@@ -73,12 +73,13 @@ public final class Servlet extends HttpServlet {
 			int i = 0;
 			while (it.hasNext()) {
 				JsonObject jo = new JsonObject((JSONObject) it.next());
-				String uri = jo.get("uri");
-				Class<?> controller = Class.forName(pkg + jo.get("controller"));
-				Method action = getMethod(jo.get("action"), controller);
-				String permission = jo.get("permission");
+				String uri = jo.getStr("uri");
+				Class<?> controller = Class.forName(pkg + jo.getStr("controller"));
+				Method action = getMethod(jo.getStr("action"), controller);
+				String permission = jo.getStr("permission");
+				boolean token = jo.getBool("token");
 
-				routes[i] = new Route(uri, controller, action, permission);
+				routes[i] = new Route(uri, controller, action, permission, token);
 				i++;
 			}
 
@@ -121,23 +122,22 @@ public final class Servlet extends HttpServlet {
 		App app = App.getInstance();
 		app.init(request, response);
 		Page page = app.getPage();
+		String token = app.getRequest().get("tk", "");
 
 		try {
-			if (request.getMethod().equals("POST")) {
-				String token = request.getParameter("token");
-				if (token == null || !token.equals(request.getSession().getId())) {
-					throw new ForbiddenException();
-				}
-			}
-
 			Route route = getRoute(uri); // Throw web.util.NotFoundException
-			if (!app.access(route.getPermission())) {
+
+			// Token verification
+			if ((route.hasToken() || request.getMethod().equals("POST"))
+			&& !token.equals(app.getSession().getId())) {
+				throw new ForbiddenException();
+			} else if (!app.access(route.getPermission())) {
 				throw new ForbiddenException();
 			}
 
 			app.setConnection(connectionPool.getConnection());
 			Object controller = route.getController().newInstance();
-			route.getAction().invoke(controller, route.getParams());
+			route.getAction().invoke(controller, (Object[]) route.getParams());
 		} catch (ForbiddenException e) {
 			setError(app, response, 403);
 		} catch (NotFoundException e) {
@@ -163,13 +163,14 @@ public final class Servlet extends HttpServlet {
 			Matcher m = Pattern.compile(r.getUri()).matcher(uri);
 			if (m.matches()) {
 				int nbParam = m.groupCount();
-				Object[] params = new Object[nbParam];
+				String[] params = new String[nbParam];
 
 				for (int i = 1; i <= nbParam; i++) {
 					params[i - 1] = m.group(i);
 				}
 
-				return new Route(r.getUri(), r.getController(), r.getAction(), r.getPermission(), params);
+				return new Route(r.getUri(), r.getController(), r.getAction(), r.getPermission(),
+					r.hasToken(), params);
 			}
 		}
 

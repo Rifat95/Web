@@ -20,8 +20,16 @@ public final class JsonObject {
 		return this;
 	}
 
-	public String get(String var) {
+	public String getStr(String var) {
 		return (String) jo.get(var);
+	}
+
+	public int getInt(String var) {
+		return (int) jo.get(var);
+	}
+
+	public boolean getBool(String var) {
+		return (boolean) jo.get(var);
 	}
 
 	@Override

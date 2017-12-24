@@ -29,6 +29,10 @@ public final class Session {
 		servletSession.setAttribute(attr, value);
 	}
 
+	public String getId() {
+		return servletSession.getId();
+	}
+
 	public void destroy() {
 		servletSession.invalidate();
 	}

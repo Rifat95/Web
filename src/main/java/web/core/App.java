@@ -2,8 +2,10 @@ package web.core;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import web.util.Util;
 
 // Thread local singleton class
 public final class App {
@@ -19,7 +21,7 @@ public final class App {
 	private Session session;
 	private Page page;
 	private int userId;
-	private String[] userPermissions;
+	private ArrayList<String> userPermissions;
 	private Translator t;
 	private Connection connection;
 
@@ -53,19 +55,13 @@ public final class App {
 		return connection;
 	}
 
-	public void setUser(int id, String[] permissions) {
+	public void setUser(int id, ArrayList<String> permissions) {
 		userId = id;
 		userPermissions = permissions;
 	}
 
 	public boolean access(String permission) {
-		for (String s : userPermissions) {
-			if (s.equals(permission)) {
-				return true;
-			}
-		}
-
-		return false;
+		return userPermissions.contains(permission);
 	}
 
 	HttpServletResponse getResponse() {
@@ -75,13 +71,14 @@ public final class App {
 	/**
 	 * Must be called at the start of core.Servlet.process() only.
 	 */
+	@SuppressWarnings("unchecked")
 	void init(HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
 		request = new Request(servletRequest);
 		response = servletResponse;
 		session = new Session(servletRequest.getSession());
 		page = new Page();
 		userId = (int) session.get("userId", 0);
-		userPermissions = (String[]) session.get("userPermissions", new String[]{"guest"});
+		userPermissions = (ArrayList<String>) session.get("userPermissions", Util.strList("guest"));
 		t = new Translator();
 	}
 

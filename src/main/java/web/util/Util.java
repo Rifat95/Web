@@ -1,5 +1,7 @@
 package web.util;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import web.core.Servlet;
 
 // Static singleton class
@@ -15,5 +17,9 @@ public final class Util {
 
 	public static String uri(String path) {
 		return Servlet.getWebContext() + path;
+	}
+
+	public static ArrayList<String> strList(String... values) {
+		return new ArrayList<>(Arrays.asList(values));
 	}
 }

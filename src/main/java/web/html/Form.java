@@ -20,7 +20,7 @@ public class Form extends DoubleTag {
 	@Override
 	public String toString() {
 		String token = App.getInstance().getSession().getId();
-		insert("<input type=\"hidden\" name=\"tk\" value=\"" + token + "\" />");
+		insert("<input type=\"hidden\" name=\"tk\" value=\"" + token + "\"/>");
 		return super.toString();
 	}
 }

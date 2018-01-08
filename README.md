@@ -207,9 +207,10 @@ the properties file for the chosen language exists.
 - continuous indentation / other line break: 1 tab
 - brace placement: same line
 - xml/html/css: file-case, double quotes
-- 1 space before closing html single tags: `<img src="x" />`
+- no space before closing html single tags: `<img src="x"/>`
 - less variables: camelCase
 - javascript: camelCase, double quotes
+- json: camelCase
 - sql tables: PascalCase
 - sql fields: camelCase
 

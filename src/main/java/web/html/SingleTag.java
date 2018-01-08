@@ -7,6 +7,6 @@ public class SingleTag extends HtmlTag {
 
 	@Override
 	public String toString() {
-		return prefix + "<" + name + attributes + " />" + suffix;
+		return prefix + "<" + name + attributes + "/>" + suffix;
 	}
 }

@@ -4,16 +4,16 @@ import web.core.App;
 
 public class Form extends DoubleTag {
 	public Form() {
-		this("post");
+		super("form");
 	}
 
 	public Form(String method) {
-		this(method, "");
+		this();
+		addAttr("method", method);
 	}
 
 	public Form(String method, String action) {
-		super("form");
-		addAttr("method", method);
+		this(method);
 		addAttr("action", action);
 	}
 

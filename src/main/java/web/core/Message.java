@@ -2,7 +2,7 @@ package web.core;
 
 public final class Message {
 	public static final String INFO = "info";
-	public static final String SUCCESS = "message";
+	public static final String SUCCESS = "success";
 	public static final String WARNING = "warning";
 
 	private String type;

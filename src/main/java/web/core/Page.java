@@ -3,8 +3,7 @@ package web.core;
 import java.io.IOException;
 import java.util.ArrayList;
 import javax.servlet.http.HttpServletResponse;
-import org.json.simple.JSONObject;
-import web.util.JsonObject;
+import org.json.JSONObject;
 import web.util.Util;
 
 public final class Page {
@@ -28,7 +27,7 @@ public final class Page {
 		response = v;
 	}
 
-	public void setJson(JsonObject jo) {
+	public void setJson(JSONObject jo) {
 		response = jo;
 		renderMode = "json"; // Override render mode because json can't be displayed as html
 	}
@@ -82,7 +81,7 @@ public final class Page {
 
 			if (response instanceof View) {
 				View v = (View) response;
-				output = new JSONObject(v.getData()).toJSONString();
+				output = new JSONObject(v.getData()).toString();
 			} else {
 				output = response.toString();
 			}

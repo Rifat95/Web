@@ -4,12 +4,10 @@ import com.mitchellbosecke.pebble.PebbleEngine;
 import com.mitchellbosecke.pebble.loader.ServletLoader;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.ResourceBundle;
@@ -19,11 +17,10 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
+import org.apache.commons.io.FileUtils;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import web.util.ForbiddenException;
-import web.util.JsonObject;
 import web.util.NotFoundException;
 import web.util.RedirectionException;
 
@@ -61,26 +58,22 @@ public final class Servlet extends HttpServlet {
 			.build();
 
 		try {
-			ClassLoader loader = servletContext.getClassLoader();
-
 			// Load routes
+			ClassLoader loader = servletContext.getClassLoader();
 			String pkg = getInitParam("package") + ".controller.";
-			InputStream is = loader.getResourceAsStream("conf/routes.json");
-			JSONArray array = (JSONArray) new JSONParser().parse(new InputStreamReader(is));
-			Iterator<?> it = array.iterator();
-			routes = new Route[array.size()];
+			File routeFile = new File(loader.getResource("conf/routes.json").getPath());
+			JSONArray routeList = new JSONArray(FileUtils.readFileToString(routeFile, "UTF-8"));
+			int nbRoute = routeList.length();
+			routes = new Route[nbRoute];
 
-			int i = 0;
-			while (it.hasNext()) {
-				JsonObject jo = new JsonObject((JSONObject) it.next());
-				String uri = jo.getStr("uri");
-				Class<?> controller = Class.forName(pkg + jo.getStr("controller"));
-				Method action = getMethod(jo.getStr("action"), controller);
-				String permission = jo.getStr("permission");
-				boolean token = jo.getBool("token");
-
+			for (int i = 0; i < nbRoute; i++) {
+				JSONObject jo = routeList.getJSONObject(i);
+				String uri = jo.getString("uri");
+				Class<?> controller = Class.forName(pkg + jo.getString("controller"));
+				Method action = getMethod(jo.getString("action"), controller);
+				String permission = jo.getString("permission");
+				boolean token = jo.getBoolean("token");
 				routes[i] = new Route(uri, controller, action, permission, token);
-				i++;
 			}
 
 			// Load strings
@@ -96,7 +89,7 @@ public final class Servlet extends HttpServlet {
 			connectionPool = new HikariDataSource(new HikariConfig(dbInfos));
 		} catch (Exception e) {
 			// Fatal error
-			System.exit(-1);
+			e.printStackTrace();
 		}
 	}
 

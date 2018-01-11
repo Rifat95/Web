@@ -17,7 +17,7 @@ public final class DeleteQuery<E extends Entity> extends Query<E, DeleteQuery<E>
 			prepareStatemment("DELETE FROM " + table + " WHERE " + conditions);
 			statement.executeUpdate();
 		} catch (SQLException e) {
-			throw new ServerException();
+			throw new ServerException(e);
 		} finally {
 			clean();
 		}

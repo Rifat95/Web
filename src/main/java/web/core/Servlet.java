@@ -5,8 +5,10 @@ import com.mitchellbosecke.pebble.loader.ServletLoader;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Properties;
@@ -19,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.FileUtils;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import web.util.ForbiddenException;
 import web.util.NotFoundException;
@@ -87,9 +90,9 @@ public final class Servlet extends HttpServlet {
 			Properties dbInfos = new Properties();
 			dbInfos.load(loader.getResourceAsStream("conf/db.properties"));
 			connectionPool = new HikariDataSource(new HikariConfig(dbInfos));
-		} catch (Exception e) {
+		} catch (IOException | ClassNotFoundException | NoSuchMethodException | JSONException e) {
 			// Fatal error
-			e.printStackTrace();
+			e.printStackTrace(); // @todo Replace with logger
 		}
 	}
 
@@ -140,11 +143,13 @@ public final class Servlet extends HttpServlet {
 				setError(app, response, 404);
 			} else if (e.getCause() instanceof RedirectionException) {
 				page.setRedirection(e.getMessage());
-			} else {
+			} else { // ServerException and other exceptions
 				setError(app, response, 500);
+				e.getCause().printStackTrace(); // @todo Replace with logger
 			}
-		} catch (Exception e) {
+		} catch (IllegalAccessException | IllegalArgumentException | InstantiationException | SQLException e) {
 			setError(app, response, 500);
+			e.printStackTrace(); // @todo Replace with logger
 		} finally {
 			page.send();
 			app.clean();

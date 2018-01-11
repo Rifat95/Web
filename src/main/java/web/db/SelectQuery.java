@@ -99,7 +99,7 @@ public final class SelectQuery<E extends Entity> extends Query<E, SelectQuery<E>
 				nbLine = result.getInt("nbLine");
 			}
 		} catch (SQLException e) {
-			throw new ServerException();
+			throw new ServerException(e);
 		} finally {
 			clean();
 		}
@@ -123,8 +123,8 @@ public final class SelectQuery<E extends Entity> extends Query<E, SelectQuery<E>
 
 				entity.init();
 			}
-		} catch (Exception e) {
-			throw new ServerException();
+		} catch (IllegalAccessException | InstantiationException | SQLException e) {
+			throw new ServerException(e);
 		} finally {
 			clean();
 		}
@@ -153,8 +153,8 @@ public final class SelectQuery<E extends Entity> extends Query<E, SelectQuery<E>
 				entity.init();
 				entities.add(entity);
 			}
-		} catch (Exception e) {
-			throw new ServerException();
+		} catch (IllegalAccessException | InstantiationException | SQLException e) {
+			throw new ServerException(e);
 		} finally {
 			clean();
 		}
@@ -177,7 +177,7 @@ public final class SelectQuery<E extends Entity> extends Query<E, SelectQuery<E>
 				}
 			}
 		} catch (SQLException e) {
-			throw new ServerException();
+			throw new ServerException(e);
 		} finally {
 			clean();
 		}

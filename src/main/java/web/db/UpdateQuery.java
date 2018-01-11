@@ -29,7 +29,7 @@ public final class UpdateQuery<E extends Entity> extends Query<E, UpdateQuery<E>
 
 			statement.executeUpdate();
 		} catch (SQLException e) {
-			throw new ServerException();
+			throw new ServerException(e);
 		} finally {
 			clean();
 		}

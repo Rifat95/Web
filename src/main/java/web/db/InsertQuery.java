@@ -44,7 +44,7 @@ public final class InsertQuery<E extends Entity> extends Query<E, InsertQuery<E>
 				id = result.getInt(1);
 			}
 		} catch (SQLException e) {
-			throw new ServerException();
+			throw new ServerException(e);
 		} finally {
 			clean();
 		}

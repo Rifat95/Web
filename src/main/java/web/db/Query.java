@@ -37,7 +37,7 @@ public abstract class Query<E extends Entity, T extends Query<E, T>> {
 			if (settings.contains("table")) {
 				table = settings.get("table");
 			}
-		} catch (Exception e) {
+		} catch (IllegalAccessException | IllegalArgumentException | NoSuchFieldException | SecurityException e) {
 			settings = new StringMap();
 		}
 	}

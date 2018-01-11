@@ -1,5 +1,7 @@
 package web.core;
 
+import com.mitchellbosecke.pebble.error.PebbleException;
+import java.io.IOException;
 import java.io.StringWriter;
 import java.util.HashMap;
 import web.util.ServerException;
@@ -37,8 +39,8 @@ public final class View {
 			StringWriter sw = new StringWriter();
 			Servlet.getEngine().getTemplate(file).evaluate(sw, data);
 			return sw.toString();
-		} catch (Exception e) {
-			throw new ServerException();
+		} catch (PebbleException | IOException e) {
+			throw new ServerException(e);
 		}
 	}
 }

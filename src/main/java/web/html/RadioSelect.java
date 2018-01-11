@@ -15,7 +15,7 @@ public class RadioSelect extends DoubleTag {
 	}
 
 	public void addInput(String value, String title) {
-		insert(getInput(value, title));
+		insert(getInput(value, title).toString());
 	}
 
 	/**

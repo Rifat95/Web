@@ -21,16 +21,8 @@ public abstract class HtmlTag {
 		attributes += " " + name + "=\"" + value + "\"";
 	}
 
-	public final void setPrefix(HtmlTag tag) {
-		setPrefix(tag.toString());
-	}
-
 	public final void setPrefix(String content) {
 		prefix = content;
-	}
-
-	public final void setSuffix(HtmlTag tag) {
-		setSuffix(tag.toString());
 	}
 
 	public final void setSuffix(String content) {

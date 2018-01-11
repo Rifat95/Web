@@ -24,7 +24,7 @@ public final class UpdateQuery<E extends Entity> extends Query<E, UpdateQuery<E>
 	public void execute() {
 		try {
 			// Remove the last comma from fields
-			prepareStatemment("UPDATE " + table + " SET" + fields.substring(0, fields.length() - 1)
+			prepareStatemment("UPDATE `" + table + "` SET" + fields.substring(0, fields.length() - 1)
 				+ " WHERE " + conditions);
 
 			statement.executeUpdate();

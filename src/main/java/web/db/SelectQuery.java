@@ -190,7 +190,7 @@ public final class SelectQuery<E extends Entity> extends Query<E, SelectQuery<E>
 	}
 
 	private void execute() throws SQLException {
-		prepareStatemment("SELECT " + fields + " FROM " + table + joins + " WHERE " + conditions
+		prepareStatemment("SELECT " + fields + " FROM `" + table + "`" + joins + " WHERE " + conditions
 			+ groupBy + order + limit);
 
 		result = statement.executeQuery();

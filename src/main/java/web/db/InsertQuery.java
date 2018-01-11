@@ -33,7 +33,7 @@ public final class InsertQuery<E extends Entity> extends Query<E, InsertQuery<E>
 
 		try {
 			// Remove the last comma and space from fields and markups
-			prepareStatemmentWithKeys("INSERT INTO " + table + "("
+			prepareStatemmentWithKeys("INSERT INTO `" + table + "`("
 				+ fields.substring(0, fields.length() - 2) + ") VALUES ("
 				+ markups.substring(0, markups.length() - 2) + ")");
 

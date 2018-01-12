@@ -56,6 +56,8 @@ public final class App {
 	}
 
 	public void setUser(int id, ArrayList<String> permissions) {
+		session.set("userId", id);
+		session.set("userPermissions", permissions);
 		userId = id;
 		userPermissions = permissions;
 	}

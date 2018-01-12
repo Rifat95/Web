@@ -29,7 +29,7 @@ public abstract class Entity {
 	}
 
 	public final int getId() {
-		return (int) rawData.get("id");
+		return ((Number) rawData.get("id")).intValue();
 	}
 
 	public final void set(String var, Object value) {

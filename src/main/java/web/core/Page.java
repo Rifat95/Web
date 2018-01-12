@@ -37,12 +37,12 @@ public final class Page {
 	}
 
 	/**
-	 * Must be called from core.Servlet.process() only, RedirectionException should be used for
-	 * redirection to make sure that no code will be executed after the redirection.
+	 * This method ensure that user will be redirected after the end of execution.
+	 * To immediatly stop code execution and redirect the user, use RedirectionException.
 	 *
 	 * @param location the absolute URI or URL
 	 */
-	void setRedirection(String location) {
+	public void setRedirection(String location) {
 		response = location;
 		renderMode = "redirection";
 	}

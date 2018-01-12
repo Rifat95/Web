@@ -15,6 +15,10 @@ public final class Util {
 		return INSTANCE;
 	}
 
+	/**
+	 * @param path the absolute path
+	 * @return web context + path
+	 */
 	public static String uri(String path) {
 		return Servlet.getWebContext() + path;
 	}

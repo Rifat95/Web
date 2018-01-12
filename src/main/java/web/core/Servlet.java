@@ -122,12 +122,12 @@ public final class Servlet extends HttpServlet {
 
 		try {
 			Route route = getRoute(uri); // Throw web.util.NotFoundException
+			String permission = route.getPermission();
 
-			// Token verification
-			if ((route.hasToken() || request.getMethod().equals("POST"))
+			if ((route.hasToken() || request.getMethod().equals("POST")) // Token verification
 			&& !token.equals(app.getSession().getId())) {
 				throw new ForbiddenException();
-			} else if (!app.access(route.getPermission())) {
+			} else if (!permission.equals("all") && !app.access(permission)) { // Permission verification
 				throw new ForbiddenException();
 			}
 

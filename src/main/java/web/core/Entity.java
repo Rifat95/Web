@@ -17,23 +17,23 @@ public abstract class Entity {
 	protected App app;
 	protected Page page;
 	protected Translator t;
-	protected HashMap<String, Object> data;
+	protected HashMap<String, Object> rawData;
 	protected boolean valid;
 
 	public Entity() {
 		app = App.getInstance();
 		page = app.getPage();
 		t = app.getT();
-		data = new HashMap<>();
+		rawData = new HashMap<>();
 		valid = true;
 	}
 
-	public int getId() {
-		return (int) data.get("id");
+	public final int getId() {
+		return (int) rawData.get("id");
 	}
 
 	public final void set(String var, Object value) {
-		data.put(var, value);
+		rawData.put(var, value);
 	}
 
 	public final void fetch(String id) {
@@ -41,41 +41,43 @@ public abstract class Entity {
 	}
 
 	public final void fetch(int id) {
-		data = new SelectQuery<>(getClass())
+		rawData = new SelectQuery<>(getClass())
 			.addCondition("id", "=", id)
 			.getData();
 	}
 
 	public final void save() {
-		if (data.containsKey("id")) {
-			UpdateQuery<?> uQuery = new UpdateQuery<>(getClass());
-			data.entrySet().forEach((entry) -> {
-				uQuery.set(entry.getKey(), entry.getValue());
-			});
+		if (valid) {
+			if (rawData.containsKey("id")) {
+				UpdateQuery<?> uQuery = new UpdateQuery<>(getClass());
+				rawData.entrySet().forEach((entry) -> {
+					uQuery.set(entry.getKey(), entry.getValue());
+				});
 
-			uQuery.addCondition("id", "=", data.get("id")).execute();
-		} else {
-			InsertQuery<?> iQuery = new InsertQuery<>(getClass());
-			data.entrySet().forEach((entry) -> {
-				iQuery.set(entry.getKey(), entry.getValue());
-			});
+				uQuery.addCondition("id", "=", rawData.get("id")).execute();
+			} else {
+				InsertQuery<?> iQuery = new InsertQuery<>(getClass());
+				rawData.entrySet().forEach((entry) -> {
+					iQuery.set(entry.getKey(), entry.getValue());
+				});
 
-			int id = iQuery.execute();
-			data.put("id", id);
+				int id = iQuery.execute();
+				rawData.put("id", id);
+			}
 		}
 	}
 
 	public final void delete() {
 		new DeleteQuery<>(getClass())
-			.addCondition("id", "=", data.get("id"))
+			.addCondition("id", "=", rawData.get("id"))
 			.execute();
 
-		data.clear();
+		rawData.clear();
 	}
 
 	/**
-	 * This method is called by SelectQuery after data insertion in entity, childrens can override
-	 * it to alter data.
+	 * This method is called by SelectQuery after data insertion in entity, childrens must override
+	 * it to set their attributes.
 	 */
-	public void init() {}
+	public abstract void init();
 }

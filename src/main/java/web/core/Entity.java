@@ -28,8 +28,8 @@ public abstract class Entity {
 		valid = true;
 	}
 
-	public final Object get(String var) {
-		return data.get(var);
+	public int getId() {
+		return (int) data.get("id");
 	}
 
 	public final void set(String var, Object value) {

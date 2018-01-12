@@ -32,19 +32,19 @@ public final class Page {
 		renderMode = "json"; // Override render mode because json can't be displayed as html
 	}
 
+	public void addMessage(Message m) {
+		messages.add(m);
+	}
+
 	/**
 	 * Must be called from core.Servlet.process() only, RedirectionException should be used for
 	 * redirection to make sure that no code will be executed after the redirection.
 	 *
 	 * @param location the absolute URI or URL
 	 */
-	public void setRedirection(String location) {
-		response = location.startsWith("http") ? location : Util.uri(location);
+	void setRedirection(String location) {
+		response = location;
 		renderMode = "redirection";
-	}
-
-	public void addMessage(Message m) {
-		messages.add(m);
 	}
 
 	/**

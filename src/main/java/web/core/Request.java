@@ -19,4 +19,22 @@ public final class Request {
 		String requestParam = servletRequest.getParameter(param);
 		return requestParam != null ? requestParam : defaultValue;
 	}
+
+	public boolean contains(String... params) {
+		for (String param : params) {
+			if (servletRequest.getParameter(param) == null) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	public boolean isGet() {
+		return servletRequest.getMethod().equals("GET");
+	}
+
+	public boolean isPost() {
+		return servletRequest.getMethod().equals("POST");
+	}
 }

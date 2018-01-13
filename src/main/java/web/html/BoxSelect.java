@@ -21,7 +21,7 @@ public class BoxSelect extends DoubleTag {
 	}
 
 	/**
-	 * This method can be used to customize an input before inserting it into the BoxSelect
+	 * This method can be used to customize an input before inserting it into the BoxSelect.
 	 *
 	 * @param value
 	 * @param title

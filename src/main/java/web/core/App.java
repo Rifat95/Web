@@ -7,7 +7,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import web.util.Util;
 
-// Thread local singleton class
+/**
+ * Thread local singleton
+ */
 public final class App {
 	private static final ThreadLocal<App> INSTANCE = new ThreadLocal<App>() {
 		@Override

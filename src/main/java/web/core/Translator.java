@@ -25,11 +25,12 @@ public final class Translator {
 	}
 
 	/**
-	 * For Pebble templates only, example of use: t.t("str", ["arg1", "arg2"])
+	 * For Pebble templates only.
+	 * Example of use: t.t("str", ["arg1", "arg2"])
 	 *
 	 * @param key
-	 * @param l
-	 * @return String
+	 * @param l the arguments
+	 * @return the string associated with the key
 	 */
 	public String t(String key, List<Object> l) {
 		return t(key, l.toArray());

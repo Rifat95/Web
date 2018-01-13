@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import javax.servlet.http.HttpServletResponse;
 import org.json.JSONObject;
-import web.util.Util;
 
 public final class Page {
 	private String title;

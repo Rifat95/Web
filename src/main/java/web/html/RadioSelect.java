@@ -19,7 +19,7 @@ public class RadioSelect extends DoubleTag {
 	}
 
 	/**
-	 * This method can be used to customize an input before inserting it into the RadioSelect
+	 * This method can be used to customize an input before inserting it into the RadioSelect.
 	 *
 	 * @param value
 	 * @param title

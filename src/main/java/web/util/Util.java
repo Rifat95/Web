@@ -2,15 +2,22 @@ package web.util;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import web.core.App;
 import web.core.Servlet;
 
-// Static singleton class
+/**
+ * Static singleton class
+ */
 public final class Util {
 	private static final Util INSTANCE = new Util();
 
 	private Util() {}
 
-	// To pass the class instance to templates
+	/**
+	 * Only to pass the class instance to templates in web.core.View.toString().
+	 *
+	 * @return static class instance
+	 */
 	public static Util getInstance() {
 		return INSTANCE;
 	}
@@ -21,6 +28,25 @@ public final class Util {
 	 */
 	public static String uri(String path) {
 		return Servlet.getWebContext() + path;
+	}
+
+	/**
+	 * For templates only, because web.core.App is not accessible from templates.
+	 *
+	 * @param permission
+	 * @return true if user has the specified permission
+	 */
+	public static boolean access(String permission) {
+		return App.getInstance().access(permission);
+	}
+
+	/**
+	 * For templates only, because web.core.App is not accessible from templates.
+	 *
+	 * @return the user session id (token)
+	 */
+	public static String getToken() {
+		return App.getInstance().getSession().getId();
 	}
 
 	public static ArrayList<String> strList(String... values) {

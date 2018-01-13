@@ -2,7 +2,9 @@ package web.core;
 
 import javax.servlet.http.HttpServletRequest;
 
-// HttpServletRequest wrapper class
+/**
+ * HttpServletRequest wrapper class
+ */
 public final class Request {
 	private HttpServletRequest servletRequest;
 

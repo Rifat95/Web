@@ -1,10 +1,8 @@
 package web.db;
 
-import java.sql.ResultSetMetaData;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import web.core.Entity;
 import web.util.NotFoundException;
 import web.util.ServerException;
 
@@ -87,12 +85,13 @@ public final class SelectQuery<E extends Entity> extends Query<E, SelectQuery<E>
 	}
 
 	public int count() {
+		ResultSet result = null;
 		int nbLine = 0;
 
 		try {
 			String tmp = fields;
 			fields = "COUNT(*) as nbLine";
-			execute();
+			result = getResultSet();
 			fields = tmp;
 
 			if (result.next()) {
@@ -101,32 +100,47 @@ public final class SelectQuery<E extends Entity> extends Query<E, SelectQuery<E>
 		} catch (SQLException e) {
 			throw new ServerException(e);
 		} finally {
-			clean();
+			clean(result);
 		}
 
 		return nbLine;
 	}
 
+	public void fill(Entity entity) {
+		ResultSet result = null;
+		boolean noResult = true;
+
+		try {
+			result = getResultSet();
+			if (result.next()) {
+				entity.init(result);
+				noResult = false;
+			}
+		} catch (SQLException e) {
+			throw new ServerException(e);
+		} finally {
+			clean(result);
+		}
+
+		if (noResult) {
+			throw new NotFoundException();
+		}
+	}
+
 	public E get() {
+		ResultSet result = null;
 		E entity = null;
 
 		try {
-			execute();
+			result = getResultSet();
 			if (result.next()) {
 				entity = entityClass.newInstance();
-				ResultSetMetaData meta = result.getMetaData();
-				int nbColumn = meta.getColumnCount();
-
-				for (int i = 1; i <= nbColumn; i++) {
-					entity.set(meta.getColumnName(i), result.getObject(i));
-				}
-
-				entity.init();
+				entity.init(result);
 			}
 		} catch (IllegalAccessException | InstantiationException | SQLException e) {
 			throw new ServerException(e);
 		} finally {
-			clean();
+			clean(result);
 		}
 
 		if (entity == null) {
@@ -137,62 +151,29 @@ public final class SelectQuery<E extends Entity> extends Query<E, SelectQuery<E>
 	}
 
 	public ArrayList<E> getAll() {
+		ResultSet result = null;
 		ArrayList<E> entities = new ArrayList<>();
 
 		try {
-			execute();
+			result = getResultSet();
 			while (result.next()) {
 				E entity = entityClass.newInstance();
-				ResultSetMetaData meta = result.getMetaData();
-				int nbColumn = meta.getColumnCount();
-
-				for (int i = 1; i <= nbColumn; i++) {
-					entity.set(meta.getColumnName(i), result.getObject(i));
-				}
-
-				entity.init();
+				entity.init(result);
 				entities.add(entity);
 			}
 		} catch (IllegalAccessException | InstantiationException | SQLException e) {
 			throw new ServerException(e);
 		} finally {
-			clean();
+			clean(result);
 		}
 
 		return entities;
 	}
 
-	public HashMap<String, Object> getData() {
-		HashMap<String, Object> data = null;
-
-		try {
-			execute();
-			if (result.next()) {
-				data = new HashMap<>();
-				ResultSetMetaData meta = result.getMetaData();
-				int nbColumn = meta.getColumnCount();
-
-				for (int i = 1; i <= nbColumn; i++) {
-					data.put(meta.getColumnName(i), result.getObject(i));
-				}
-			}
-		} catch (SQLException e) {
-			throw new ServerException(e);
-		} finally {
-			clean();
-		}
-
-		if (data == null) {
-			throw new NotFoundException();
-		} else {
-			return data;
-		}
-	}
-
-	private void execute() throws SQLException {
+	private ResultSet getResultSet() throws SQLException {
 		prepareStatemment("SELECT " + fields + " FROM `" + table + "`" + joins + " WHERE " + conditions
 			+ groupBy + order + limit);
 
-		result = statement.executeQuery();
+		return statement.executeQuery();
 	}
 }

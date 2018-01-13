@@ -1,7 +1,6 @@
 package web.db;
 
 import java.sql.SQLException;
-import web.core.Entity;
 import web.util.ServerException;
 
 /**
@@ -31,7 +30,7 @@ public final class UpdateQuery<E extends Entity> extends Query<E, UpdateQuery<E>
 		} catch (SQLException e) {
 			throw new ServerException(e);
 		} finally {
-			clean();
+			clean(null);
 		}
 	}
 }

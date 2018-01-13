@@ -6,7 +6,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import web.core.App;
-import web.core.Entity;
 import web.util.StringMap;
 
 /**
@@ -20,7 +19,6 @@ public abstract class Query<E extends Entity, T extends Query<E, T>> {
 	protected String conditions;
 	protected ArrayList<Object> values;
 	protected PreparedStatement statement;
-	protected ResultSet result;
 
 	private T instance;
 
@@ -49,7 +47,7 @@ public abstract class Query<E extends Entity, T extends Query<E, T>> {
 	}
 
 	protected final void prepareStatemment(String sql) throws SQLException {
-		statement = App.getInstance().getConnection().prepareStatement(sql);
+		statement = App.getInstance().getConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
 		int i = 1;
 		for (Object value : values) {
@@ -58,25 +56,12 @@ public abstract class Query<E extends Entity, T extends Query<E, T>> {
 		}
 	}
 
-	protected final void prepareStatemmentWithKeys(String sql) throws SQLException {
-		statement = App.getInstance().getConnection()
-			.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-
-		int i = 1;
-		for (Object value : values) {
-			statement.setObject(i, value);
-			i++;
-		}
-	}
-
-	protected final void clean() {
+	protected final void clean(ResultSet result) {
 		if (result != null) {
 			try {
 				result.close();
 			} catch (SQLException e) {
 				// Ignore
-			} finally {
-				result = null;
 			}
 		}
 

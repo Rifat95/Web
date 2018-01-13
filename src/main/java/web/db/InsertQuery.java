@@ -1,7 +1,7 @@
 package web.db;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
-import web.core.Entity;
 import web.util.ServerException;
 
 /**
@@ -29,11 +29,12 @@ public final class InsertQuery<E extends Entity> extends Query<E, InsertQuery<E>
 	 * @return the inserted id
 	 */
 	public int execute() {
+		ResultSet result = null;
 		int id = 0;
 
 		try {
 			// Remove the last comma and space from fields and markups
-			prepareStatemmentWithKeys("INSERT INTO `" + table + "`("
+			prepareStatemment("INSERT INTO `" + table + "`("
 				+ fields.substring(0, fields.length() - 2) + ") VALUES ("
 				+ markups.substring(0, markups.length() - 2) + ")");
 
@@ -46,7 +47,7 @@ public final class InsertQuery<E extends Entity> extends Query<E, InsertQuery<E>
 		} catch (SQLException e) {
 			throw new ServerException(e);
 		} finally {
-			clean();
+			clean(result);
 		}
 
 		return id;

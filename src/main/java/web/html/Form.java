@@ -17,10 +17,13 @@ public class Form extends DoubleTag {
 		addAttr("action", action);
 	}
 
-	@Override
-	public String toString() {
+	public void addToken() {
 		String token = App.getInstance().getSession().getId();
 		insert("<input type=\"hidden\" name=\"tk\" value=\"" + token + "\"/>");
-		return super.toString();
+	}
+
+	public void addSubmitButton(String value) {
+		addToken();
+		insert("<p><input type=\"submit\" value=\"" + value + "\"/></p>");
 	}
 }

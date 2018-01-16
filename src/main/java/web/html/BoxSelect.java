@@ -8,7 +8,7 @@ public class BoxSelect extends DoubleTag {
 
 	public BoxSelect(String groupName) {
 		super("span");
-		this.groupName = groupName + "[]";
+		this.groupName = groupName;
 		defaultValues = new ArrayList<>();
 	}
 

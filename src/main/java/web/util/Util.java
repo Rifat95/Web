@@ -1,7 +1,5 @@
 package web.util;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import web.core.App;
 import web.core.Servlet;
 
@@ -47,9 +45,5 @@ public final class Util {
 	 */
 	public static String getToken() {
 		return App.getInstance().getSession().getId();
-	}
-
-	public static ArrayList<String> strList(String... values) {
-		return new ArrayList<>(Arrays.asList(values));
 	}
 }

@@ -2,10 +2,10 @@ package web.core;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import web.util.Util;
 
 /**
  * Thread local singleton
@@ -23,7 +23,7 @@ public final class App {
 	private Session session;
 	private Page page;
 	private int userId;
-	private ArrayList<String> userPermissions;
+	private List<String> userPermissions;
 	private Translator t;
 	private Connection connection;
 
@@ -57,7 +57,7 @@ public final class App {
 		return connection;
 	}
 
-	public void setUser(int id, ArrayList<String> permissions) {
+	public void setUser(int id, List<String> permissions) {
 		session.set("userId", id);
 		session.set("userPermissions", permissions);
 		userId = id;
@@ -82,7 +82,7 @@ public final class App {
 		session = new Session(servletRequest.getSession());
 		page = new Page();
 		userId = (int) session.get("userId", 0);
-		userPermissions = (ArrayList<String>) session.get("userPermissions", Util.strList("guest"));
+		userPermissions = (List<String>) session.get("userPermissions", Arrays.asList("guest"));
 		t = new Translator();
 	}
 

@@ -17,9 +17,18 @@ public final class Request {
 		return requestParam != null ? requestParam : "";
 	}
 
+	public String[] getAll(String param) {
+		String[] requestParam = servletRequest.getParameterValues(param);
+		return requestParam != null ? requestParam : new String[0];
+	}
+
 	public String get(String param, String defaultValue) {
 		String requestParam = servletRequest.getParameter(param);
 		return requestParam != null ? requestParam : defaultValue;
+	}
+
+	public String getIpAddress() {
+		return servletRequest.getRemoteAddr();
 	}
 
 	public boolean contains(String... params) {

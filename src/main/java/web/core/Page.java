@@ -31,6 +31,10 @@ public final class Page {
 		renderMode = "json"; // Override render mode because json can't be displayed as html
 	}
 
+	public void addMessage(String type, String content) {
+		addMessage(new Message(type, content));
+	}
+
 	public void addMessage(Message m) {
 		messages.add(m);
 	}

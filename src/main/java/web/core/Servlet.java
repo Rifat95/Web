@@ -57,7 +57,7 @@ public final class Servlet extends HttpServlet {
 		servletContext = getServletContext();
 		engine = new PebbleEngine.Builder()
 			.loader(new ServletLoader(servletContext))
-			.strictVariables(true)
+			.strictVariables(false)
 			.build();
 
 		try {

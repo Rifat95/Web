@@ -8,26 +8,16 @@ import web.util.ServerException;
 import web.util.Util;
 
 public final class View {
-	private String file;
+	private String template;
 	private HashMap<String, Object> data;
 
 	public View(String name) {
-		file = "/WEB-INF/templates/" + name + ".tpl";
+		template = name;
 		data = new HashMap<>();
 	}
 
-	public HashMap<String, Object> getData() {
-		return data;
-	}
-
-	public View setData(HashMap<String, Object> map) {
-		data = map;
-		return this;
-	}
-
-	public View add(String var, Object value) {
+	public void set(String var, Object value) {
 		data.put(var, value);
-		return this;
 	}
 
 	@Override
@@ -37,7 +27,7 @@ public final class View {
 
 		try {
 			StringWriter sw = new StringWriter();
-			Servlet.getEngine().getTemplate(file).evaluate(sw, data);
+			Servlet.getTemplateEngine().getTemplate(template).evaluate(sw, data);
 			return sw.toString();
 		} catch (PebbleException | IOException e) {
 			throw new ServerException(e);

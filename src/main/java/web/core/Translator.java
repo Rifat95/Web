@@ -9,9 +9,9 @@ public final class Translator {
 	private MessageFormat formatter;
 
 	public Translator() {
-		String defaultLanguage = Servlet.getInitParam("defaultLanguage");
+		String defaultLanguage = Servlet.getSetting("default.language");
 		String language = (String) App.getInstance().getSession().get("language", defaultLanguage);
-		strings = Servlet.getBundle(language);
+		strings = Servlet.getLanguagePack(language);
 		formatter = new MessageFormat("", strings.getLocale());
 	}
 
@@ -37,7 +37,7 @@ public final class Translator {
 	}
 
 	public void setLanguage(String language) {
-		ResourceBundle bundle = Servlet.getBundle(language);
+		ResourceBundle bundle = Servlet.getLanguagePack(language);
 		if (bundle != null) {
 			App.getInstance().getSession().set("language", language);
 			strings = bundle;

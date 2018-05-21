@@ -6,9 +6,7 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Properties;
@@ -25,45 +23,55 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import web.util.ForbiddenException;
 import web.util.NotFoundException;
-import web.util.RedirectionException;
 
 public final class Servlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-	private static ServletContext servletContext;
-	private static PebbleEngine engine;
+	private static Properties settings;
+	private static PebbleEngine templateEngine;
 	private static Route[] routes;
+	private static Class<MainController> mainClass;
 	private static HashMap<String, ResourceBundle> i18nBundles;
 	private static HikariDataSource connectionPool;
 
-	public static String getWebContext() {
-		return servletContext.getContextPath();
+	public static String getSetting(String name) {
+		return settings.getProperty(name);
 	}
 
-	static String getInitParam(String name) {
-		return servletContext.getInitParameter(name);
+	static PebbleEngine getTemplateEngine() {
+		return templateEngine;
 	}
 
-	static PebbleEngine getEngine() {
-		return engine;
-	}
-
-	static ResourceBundle getBundle(String language) {
+	static ResourceBundle getLanguagePack(String language) {
 		return i18nBundles.get(language);
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public void init() {
-		servletContext = getServletContext();
-		engine = new PebbleEngine.Builder()
-			.loader(new ServletLoader(servletContext))
-			.strictVariables(false)
+		ServletContext servletContext = getServletContext();
+
+		// Configure template engine
+		ServletLoader templateLoader = new ServletLoader(servletContext);
+		templateLoader.setPrefix("/WEB-INF/templates/");
+		templateLoader.setSuffix(".tpl");
+		templateEngine = new PebbleEngine.Builder()
+			.loader(templateLoader)
+			.strictVariables(true)
 			.build();
 
 		try {
-			// Load routes
 			ClassLoader loader = servletContext.getClassLoader();
-			String pkg = getInitParam("package") + ".controller.";
+
+			// Load settings
+			settings = new Properties();
+			settings.load(loader.getResourceAsStream("conf/settings.properties"));
+			settings.put("context.path", servletContext.getContextPath());
+
+			// Load main controller
+			mainClass = (Class<MainController>) Class.forName("app.controller.Main");
+
+			// Load routes
 			File routeFile = new File(loader.getResource("conf/routes.json").getPath());
 			JSONArray routeList = new JSONArray(FileUtils.readFileToString(routeFile, "UTF-8"));
 			int nbRoute = routeList.length();
@@ -72,16 +80,18 @@ public final class Servlet extends HttpServlet {
 			for (int i = 0; i < nbRoute; i++) {
 				JSONObject jo = routeList.getJSONObject(i);
 				String uri = jo.getString("uri");
-				Class<?> controller = Class.forName(pkg + jo.getString("controller"));
-				Method action = getMethod(jo.getString("action"), controller);
+				String[] controllerInfos = jo.getString("controller").split("@");
 				String permission = jo.getString("permission");
-				boolean token = jo.getBoolean("token");
+				boolean token = jo.has("token") ? jo.getBoolean("token") : false;
+
+				Class<?> controller = Class.forName("app.controller." + controllerInfos[0]);
+				Method action = getMethod(controllerInfos[1], controller);
 				routes[i] = new Route(uri, controller, action, permission, token);
 			}
 
-			// Load strings
+			// Load language packs
 			i18nBundles = new HashMap<>();
-			String[] languages = getInitParam("languages").split(",");
+			String[] languages = Servlet.getSetting("supported.languages").split(",");
 			for (String lang : languages) {
 				i18nBundles.put(lang, ResourceBundle.getBundle("i18n.strings", new Locale(lang), loader));
 			}
@@ -114,45 +124,38 @@ public final class Servlet extends HttpServlet {
 	}
 
 	private void process(HttpServletRequest request, HttpServletResponse response) {
-		String uri = request.getRequestURI().substring(getWebContext().length());
+		String uri = request.getRequestURI().substring(Servlet.getSetting("context.path").length());
 		App app = App.getInstance();
 		app.init(request, response);
 		Page page = app.getPage();
 		String token = app.getRequest().get("tk", "");
 
 		try {
-			Route route = getRoute(uri); // Throw web.util.NotFoundException
-			String permission = route.getPermission();
+			MainController mainController = mainClass.newInstance();
+			mainController.init();
 
-			if ((route.hasToken() || request.getMethod().equals("POST")) // Token verification
-			&& !token.equals(app.getSession().getId())) {
-				throw new ForbiddenException();
-			} else if (!permission.equals("all") && !app.access(permission)) { // Permission verification
-				throw new ForbiddenException();
-			}
+			try {
+				Route route = getRoute(uri); // Throw web.util.NotFoundException
+				String permission = route.getPermission();
 
-			app.setConnection(connectionPool.getConnection());
-			Object controller = route.getController().newInstance();
-			route.getAction().invoke(controller, (Object[]) route.getParams());
-		} catch (ForbiddenException e) {
-			setError(app, response, 403);
-		} catch (NotFoundException e) {
-			setError(app, response, 404);
-		} catch (InvocationTargetException e) {
-			if (e.getCause() instanceof NotFoundException) {
-				setError(app, response, 404);
-			} else if (e.getCause() instanceof RedirectionException) {
-				page.setRedirection(e.getMessage());
-			} else { // ServerException and other exceptions
-				setError(app, response, 500);
-				e.getCause().printStackTrace(); // @todo Replace with logger
+				if ((route.hasToken() || request.getMethod().equals("POST")) // Token verification
+				&& !token.equals(app.getSession().getId())) {
+					throw new ForbiddenException();
+				} else if (!permission.equals("all") && !app.access(permission)) { // Permission verification
+					throw new ForbiddenException();
+				}
+
+				app.setConnection(connectionPool.getConnection());
+				route.getAction().invoke(route.getController().newInstance(), (Object[]) route.getParams());
+			} catch (Exception e) {
+				mainController.handleException(e);
+			} finally {
+				page.send();
+				app.clean();
 			}
-		} catch (IllegalAccessException | IllegalArgumentException | InstantiationException | SQLException e) {
-			setError(app, response, 500);
+		} catch (InstantiationException | IllegalAccessException e) {
+			// Fatal error
 			e.printStackTrace(); // @todo Replace with logger
-		} finally {
-			page.send();
-			app.clean();
 		}
 	}
 
@@ -167,19 +170,11 @@ public final class Servlet extends HttpServlet {
 					params[i - 1] = m.group(i);
 				}
 
-				return new Route(r.getUri(), r.getController(), r.getAction(), r.getPermission(),
-					r.hasToken(), params);
+				return new Route(r.getUri(), r.getController(), r.getAction(), r.getPermission(), r.hasToken(), params);
 			}
 		}
 
 		throw new NotFoundException();
-	}
-
-	private void setError(App app, HttpServletResponse response, int code) {
-		Page p = app.getPage();
-		p.setTitle(app.getT().t("core.error", code));
-		p.setView(new View("core/error-" + code));
-		response.setStatus(code);
 	}
 
 	private Method getMethod(String name, Class<?> c) throws NoSuchMethodException {

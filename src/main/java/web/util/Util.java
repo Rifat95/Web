@@ -25,7 +25,7 @@ public final class Util {
 	 * @return web context + path
 	 */
 	public static String uri(String path) {
-		return Servlet.getWebContext() + path;
+		return Servlet.getSetting("context.path") + path;
 	}
 
 	/**

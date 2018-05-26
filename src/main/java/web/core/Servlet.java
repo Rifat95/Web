@@ -6,6 +6,7 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Locale;
@@ -23,6 +24,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import web.util.ForbiddenException;
 import web.util.NotFoundException;
+import web.util.RedirectionException;
 
 public final class Servlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -92,6 +94,7 @@ public final class Servlet extends HttpServlet {
 			// Load language packs
 			i18nBundles = new HashMap<>();
 			String[] languages = Servlet.getSetting("supported.languages").split(",");
+
 			for (String lang : languages) {
 				i18nBundles.put(lang, ResourceBundle.getBundle("i18n.strings", new Locale(lang), loader));
 			}
@@ -132,7 +135,7 @@ public final class Servlet extends HttpServlet {
 
 		try {
 			MainController mainController = mainClass.newInstance();
-			mainController.init();
+			mainController.start();
 
 			try {
 				Route route = getRoute(uri); // Throw web.util.NotFoundException
@@ -140,14 +143,34 @@ public final class Servlet extends HttpServlet {
 
 				if ((route.hasToken() || request.getMethod().equals("POST")) // Token verification
 				&& !token.equals(app.getSession().getId())) {
-					throw new ForbiddenException();
+					throw new ForbiddenException("token");
 				} else if (!permission.equals("all") && !app.access(permission)) { // Permission verification
-					throw new ForbiddenException();
+					throw new ForbiddenException(permission);
 				}
 
 				app.setConnection(connectionPool.getConnection());
 				route.getAction().invoke(route.getController().newInstance(), (Object[]) route.getParams());
+				mainController.end();
+			} catch (NotFoundException e) {
+				response.setStatus(404);
+				mainController.handleException(e);
+			} catch (ForbiddenException e) {
+				response.setStatus(403);
+				mainController.handleException(e);
+			} catch (InvocationTargetException e) {
+				Throwable cause = e.getCause();
+
+				if (cause instanceof NotFoundException) {
+					response.setStatus(404);
+					mainController.handleException((NotFoundException) cause);
+				} else if (cause instanceof RedirectionException) {
+					page.setRedirection(cause.getMessage());
+				} else {
+					response.setStatus(500);
+					mainController.handleException((Exception) cause);
+				}
 			} catch (Exception e) {
+				response.setStatus(500);
 				mainController.handleException(e);
 			} finally {
 				page.send();

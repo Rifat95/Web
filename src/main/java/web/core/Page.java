@@ -7,6 +7,7 @@ import org.json.JSONObject;
 
 public final class Page {
 	private Object response;
+	private String contentType;
 	private String redirection;
 	private ArrayList<Message> messages;
 
@@ -17,10 +18,12 @@ public final class Page {
 
 	public void setResponse(View v) {
 		response = v;
+		contentType = "text/html;charset=UTF-8";
 	}
 
 	public void setResponse(JSONObject jo) {
 		response = jo;
+		contentType = "application/json;charset=UTF-8";
 	}
 
 	public void addMessage(String type, String content) {
@@ -46,23 +49,14 @@ public final class Page {
 	 */
 	void send() {
 		HttpServletResponse servletResponse = App.getInstance().getResponse();
-		String contentType = "text/html;charset=UTF-8";
-		String output = "";
-
-		if (response instanceof View) {
-			output = response.toString();
-		} else if (response instanceof JSONObject) {
-			contentType = "application/json;charset=UTF-8";
-			output = response.toString();
-		}
 
 		try {
 			if (redirection != null) {
 				servletResponse.sendRedirect(redirection);
-			} else {
+			} else if (response instanceof View || response instanceof JSONObject) {
 				servletResponse.setCharacterEncoding("UTF-8");
 				servletResponse.setContentType(contentType);
-				servletResponse.getWriter().write(output);
+				servletResponse.getWriter().write(response.toString());
 			}
 		} catch (IOException e) {
 			// Ignore

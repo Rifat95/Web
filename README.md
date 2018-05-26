@@ -3,9 +3,9 @@
 ### Required files
 
 - web.xml
+- settings.properties
 - db.properties
 - routes.json
-- body.tpl, messages.tpl, error-403.tpl, error-404.tpl, error-500.tpl
 
 File structure example
 ```
@@ -14,48 +14,40 @@ Project
 ├── java-src
 │   ├── packagename
 │   │   ├── controller
-│   │   │   └── java-controllers...
+│   │   │   └── Controller.java
 │   │   └── entity
-│   │       └── java-entities...
+│   │       └── Entity.java
 │   └── resources
 │       ├── conf
+│       │   ├── settings.properties
 │       │   ├── db.properties
 │       │   └── routes.json
 │       └── i18n
 │           ├── strings_fr.properties
-│           └── strings_xx.properties
 |
 └── web-app-folder
     ├── WEB-INF
     │   ├── less
-    │   │   ├── other-less-files...
     │   │   └── style.less
     │   └── templates
     │       ├── core
     │       │   ├── body.tpl
-    │       │   ├── error-403.tpl
-    │       │   ├── error-404.tpl
-    │       │   ├── error-500.tpl
+    │       │   ├── error.tpl
     │       │   ├── messages.tpl
-    │       │   └── other-core-templates...
-    │       └── page-templates...
+    │       └── home.tpl
+    │       └── login.tpl
     └── public
         ├── css
-        │   ├── other-css-files...
         │   └── style.css
+        │   └── img
+        │       └── logo.png
         ├── files
-        │   ├── img-files...
-        │   └── other-files...
+        │   └── file.pdf
         └── js
-            └── js-files...
+            └── home.js
 ```
 
-### Context parameters that need to be defined in web.xml
-- package (project's main package name)
-- languages (supported languages list, separated with comma)
-- defaultLanguage
-
-web.xml example
+### web.xml example
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app
@@ -78,24 +70,15 @@ web.xml example
 		<url-pattern>/</url-pattern>
 	</servlet-mapping>
 
-	<context-param>
-		<param-name>package</param-name>
-		<param-value>packagename</param-value>
-	</context-param>
-	<context-param>
-		<param-name>languages</param-name>
-		<param-value>en,fr,de</param-value>
-	</context-param>
-	<context-param>
-		<param-name>defaultLanguage</param-name>
-		<param-value>en</param-value>
-	</context-param>
-
 	<session-config>
 		<session-timeout>30</session-timeout>
 	</session-config>
 </web-app>
 ```
+
+### Settings that need to be defined in settings.properties
+- supported.languages (separated with comma)
+- default.language
 
 ## How it works
 
@@ -106,8 +89,8 @@ web.xml example
 
 ### web.core.Servlet.process()
 - URI parsing
-- Verify that a token match the session ID if type of request is post
-- Recuperation of matching route and access check
+- Recuperation of the matching route and access check
+- Token verification
 - Recuperation of a database connection from the connection pool
 - Instantiation of route's controller and execution of the method with arguments in URI (between "/")
 - Send the response to browser with web.core.Page.send()
@@ -128,76 +111,101 @@ routes.json example
 [
 	{
 		"uri": "/",
-		"controller": "Home",
-		"action": "show",
-		"permission": "guest",
-		"token": false
+		"controller": "Home@show",
+		"permission": "all"
+	},
+	{
+		"uri": "/login",
+		"controller": "Auth@login",
+		"permission": "guest"
 	},
 	{
 		"uri": "/news/([0-9]+)/([a-z0-9-]+)",
-		"controller": "News",
-		"action": "show",
+		"controller": "News@show",
 		"permission": "member",
-		"token": false
+		"token": true
 	}
 ]
 ```
 
-Controller example for the first route (yourpackage.controller.Home.java)
+Controller example for the first route (app.controller.Home)
 ```java
-package yourpackage.controller;
+package app.controller;
 
 import web.core.Controller;
 import web.core.View;
 
 public class Home extends Controller {
 	public void show() {
-		View v = new View("home")
-			.add("var", t.t("Hello"))
-			.add("var2", 666);
+		View v = new View("home");
+		v.add("var", t.t("Hello"));
+		v.add("var2", 666);
 
-		page.setTitle(t.t("Home page"));
-		page.setView(v);
+		page.setResponse(v);
 	}
 }
 ```
 
-Controller example for the second route (yourpackage.controller.News.java)
+Controller example for the third route (app.controller.News)
 ```java
-package yourpackage.controller;
+package app.controller;
 
 import web.core.Controller;
-import yourpackage.entity.News;
+import app.entity.News;
 
 public class News extends Controller {
 	/**
 	 * Route's regular expression : /news/([0-9]+)/([a-z0-9-]+)
 	 *
-	 * @param id corresponds to the first group of parentheses in route's regular expression
-	 * @param slug corresponds to the second group of parentheses in route's regular expression
+	 * @param id corresponds to the first group of parentheses
+	 * @param slug corresponds to the second group of parentheses
 	 */
 	public void show(String id, String slug) {
 		News n = new News(id);
-		View v = new View("news")
-			.add("news", n)
-			.add("newsSlug", slug);
+		View v = new View("news");
+		v.add("news", n);
+		v.add("newsSlug", slug);
 
-		page.setTitle(n.get("title"));
-		page.setView(v);
+		page.setResponse(v);
 	}
 }
 ```
 
 ### Connect an user
-To connect an user, use the method `web.core.App.setUser(int userId, String[] permissions)`.
-Session can be destroyed with `web.core.Session.destroy()`, session can be obtained with `web.core.app.getSession()`.
+To connect an user, use the method `web.core.App.setUser(int userId, List<String> permissions)`.
+Session can be obtained with `web.core.app.getSession()` and destroyed with `web.core.Session.destroy()`.
 
 ### Access request variables
 To access GET and POST variables, use the object `req (web.core.Request)` avalaible in controllers.
+Route's parameters (between "/" in URI) are avalaible in method's arguments.
+
+### Manage i18n
+In templates, to get the string for `welcome.msg = Salut {0}, alors comme ça tu as {1, number} ans ?`
+use `t.t("welcome.msg", ["Dimitri", 30]) }}`.
 
 ### Change language
-Use `web.core.translator.setLanguage(String language)` to change strings language, the changes will be effective only if
-the properties file for the chosen language exists.
+Use `web.core.translator.setLanguage(String language)` to change strings language,
+the changes will be effective only if the properties file for the chosen language exists.
+
+### Manage page render mode
+...
+
+### Execute database queries
+- Alter queries with entity custom query
+- Manage entity after database query
+...
+
+### Manage entities
+...
+
+### Use token verification
+...
+
+### Manage links and redirections
+...
+
+### Throw exceptions
+...
 
 ## Conventions
 
@@ -206,9 +214,8 @@ the properties file for the chosen language exists.
 - if/class/method line break: 0 tab
 - continuous indentation / other line break: 1 tab
 - brace placement: same line
-- xml/html/css: file-case, double quotes
+- xml/html/css/less: file-case, double quotes
 - no space before closing html single tags: `<img src="x"/>`
-- less variables: camelCase
 - javascript: camelCase, double quotes
 - json: camelCase
 - sql tables: PascalCase

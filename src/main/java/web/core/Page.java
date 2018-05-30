@@ -16,6 +16,10 @@ public final class Page {
 		messages = (ArrayList<Message>) App.getInstance().getSession().get("messages", new ArrayList<>());
 	}
 
+	public ArrayList<Message> getMessages() {
+		return messages;
+	}
+
 	public void setResponse(View v) {
 		response = v;
 		contentType = "text/html;charset=UTF-8";

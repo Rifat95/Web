@@ -22,8 +22,10 @@ public final class View {
 
 	@Override
 	public String toString() {
+		App app = App.getInstance();
 		data.put("u", Util.getInstance());
-		data.put("t", App.getInstance().getT());
+		data.put("t", app.getT());
+		data.put("messages", app.getPage().getMessages());
 
 		try {
 			StringWriter sw = new StringWriter();

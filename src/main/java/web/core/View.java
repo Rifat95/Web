@@ -8,31 +8,31 @@ import web.util.ServerException;
 import web.util.Util;
 
 public final class View {
-	private String template;
-	private HashMap<String, Object> data;
+    private String template;
+    private HashMap<String, Object> data;
 
-	public View(String name) {
-		template = name;
-		data = new HashMap<>();
-	}
+    public View(String name) {
+        template = name;
+        data = new HashMap<>();
+    }
 
-	public void set(String var, Object value) {
-		data.put(var, value);
-	}
+    public void set(String var, Object value) {
+        data.put(var, value);
+    }
 
-	@Override
-	public String toString() {
-		App app = App.getInstance();
-		data.put("u", Util.getInstance());
-		data.put("t", app.getT());
-		data.put("messages", app.getPage().getMessages());
+    @Override
+    public String toString() {
+        App app = App.getInstance();
+        data.put("u", Util.getInstance());
+        data.put("t", app.getT());
+        data.put("messages", app.getPage().getMessages());
 
-		try {
-			StringWriter sw = new StringWriter();
-			Servlet.getTemplateEngine().getTemplate(template).evaluate(sw, data);
-			return sw.toString();
-		} catch (PebbleException | IOException e) {
-			throw new ServerException(e);
-		}
-	}
+        try {
+            StringWriter sw = new StringWriter();
+            Servlet.getTemplateEngine().getTemplate(template).evaluate(sw, data);
+            return sw.toString();
+        } catch (PebbleException | IOException e) {
+            throw new ServerException(e);
+        }
+    }
 }

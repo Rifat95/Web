@@ -50,29 +50,28 @@ Project
 ### web.xml example
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app
-	version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
+<web-app version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
 
-	<servlet>
-		<servlet-name>Servlet</servlet-name>
-		<servlet-class>web.core.Servlet</servlet-class>
-		<load-on-startup>0</load-on-startup>
-	</servlet>
+    <servlet>
+        <servlet-name>Servlet</servlet-name>
+        <servlet-class>web.core.Servlet</servlet-class>
+        <load-on-startup>0</load-on-startup>
+    </servlet>
 
-	<servlet-mapping>
-		<servlet-name>default</servlet-name>
-		<url-pattern>/public/*</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>Servlet</servlet-name>
-		<url-pattern>/</url-pattern>
-	</servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>default</servlet-name>
+        <url-pattern>/public/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Servlet</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
 
-	<session-config>
-		<session-timeout>30</session-timeout>
-	</session-config>
+    <session-config>
+        <session-timeout>30</session-timeout>
+    </session-config>
 </web-app>
 ```
 
@@ -100,8 +99,8 @@ Project
 - Recuperation of the variable "userId" stored in session (O if not found)
 - Recuperation of the variable "userPermissions" stored in session, ("guest" if not found)
 - Instantiation of web.core.Translator
-	- Recuperation of the variable "language" stored in session (defaultLanguage if not found)
-	- Recuperation of the associated language pack
+    - Recuperation of the variable "language" stored in session (defaultLanguage if not found)
+    - Recuperation of the associated language pack
 
 ## Help
 
@@ -109,22 +108,22 @@ Project
 routes.json example
 ```json
 [
-	{
-		"uri": "/",
-		"controller": "Home@show",
-		"permission": "all"
-	},
-	{
-		"uri": "/login",
-		"controller": "Auth@login",
-		"permission": "guest"
-	},
-	{
-		"uri": "/news/([0-9]+)/([a-z0-9-]+)",
-		"controller": "News@show",
-		"permission": "member",
-		"token": true
-	}
+    {
+        "uri": "/",
+        "controller": "Home@show",
+        "permission": "all"
+    },
+    {
+        "uri": "/login",
+        "controller": "Auth@login",
+        "permission": "guest"
+    },
+    {
+        "uri": "/news/([0-9]+)/([a-z0-9-]+)",
+        "controller": "News@show",
+        "permission": "member",
+        "token": true
+    }
 ]
 ```
 
@@ -136,13 +135,13 @@ import web.core.Controller;
 import web.core.View;
 
 public class Home extends Controller {
-	public void show() {
-		View v = new View("home");
-		v.add("var", t.t("Hello"));
-		v.add("var2", 666);
+    public void show() {
+        View v = new View("home");
+        v.add("var", t.t("Hello"));
+        v.add("var2", 666);
 
-		page.setResponse(v);
-	}
+        page.setResponse(v);
+    }
 }
 ```
 
@@ -154,20 +153,20 @@ import web.core.Controller;
 import app.entity.News;
 
 public class News extends Controller {
-	/**
-	 * Route's regular expression : /news/([0-9]+)/([a-z0-9-]+)
-	 *
-	 * @param id corresponds to the first group of parentheses
-	 * @param slug corresponds to the second group of parentheses
-	 */
-	public void show(String id, String slug) {
-		News n = new News(id);
-		View v = new View("news");
-		v.add("news", n);
-		v.add("newsSlug", slug);
+    /**
+     * Route's regular expression : /news/([0-9]+)/([a-z0-9-]+)
+     *
+     * @param id corresponds to the first group of parentheses
+     * @param slug corresponds to the second group of parentheses
+     */
+    public void show(String id, String slug) {
+        News n = new News(id);
+        View v = new View("news");
+        v.add("news", n);
+        v.add("newsSlug", slug);
 
-		page.setResponse(v);
-	}
+        page.setResponse(v);
+    }
 }
 ```
 
@@ -210,9 +209,9 @@ the changes will be effective only if the properties file for the chosen languag
 ## Conventions
 
 ### Code
-- indentation: 1 tab
-- if/class/method line break: 0 tab
-- continuous indentation / other line break: 1 tab
+- indentation: 4 spaces
+- if/class/method line break: same level, 0 indentation
+- continuous indentation / other line break: 1 indentation
 - brace placement: same line
 - xml/html/css/less: file-case, double quotes
 - no space before closing html single tags: `<img src="x"/>`

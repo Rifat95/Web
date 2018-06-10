@@ -1,15 +1,12 @@
 package web.util;
 
 import web.core.App;
-import web.core.Servlet;
 
 /**
  * Static singleton class
  */
 public final class Util {
     private static final Util INSTANCE = new Util();
-
-    private Util() {}
 
     /**
      * Only to pass the class instance to templates in web.core.View.toString().
@@ -25,17 +22,17 @@ public final class Util {
      * @return web context + path
      */
     public static String uri(String path) {
-        return Servlet.getSetting("context.path") + path;
+        return App.getInstance().getSetting("context.path") + path;
     }
 
     /**
      * For templates only, because web.core.App is not accessible from templates.
      *
      * @param permission
-     * @return true if user has the specified permission
+     * @return true if application user has the specified permission
      */
     public static boolean access(String permission) {
-        return App.getInstance().access(permission);
+        return App.getInstance().getUser().hasPermission(permission);
     }
 
     /**
@@ -46,4 +43,6 @@ public final class Util {
     public static String getToken() {
         return App.getInstance().getSession().getId();
     }
+
+    private Util() {}
 }

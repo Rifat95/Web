@@ -54,19 +54,9 @@ Project
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
 
-    <servlet>
-        <servlet-name>Servlet</servlet-name>
-        <servlet-class>web.core.Servlet</servlet-class>
-        <load-on-startup>0</load-on-startup>
-    </servlet>
-
     <servlet-mapping>
         <servlet-name>default</servlet-name>
         <url-pattern>/public/*</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>Servlet</servlet-name>
-        <url-pattern>/</url-pattern>
     </servlet-mapping>
 
     <session-config>

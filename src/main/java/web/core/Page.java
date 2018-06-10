@@ -6,14 +6,20 @@ import javax.servlet.http.HttpServletResponse;
 import org.json.JSONObject;
 
 public final class Page {
+    private App app;
     private Object response;
     private String contentType;
     private String redirection;
     private ArrayList<Message> messages;
 
+    /**
+     * @param app required because this constructor is called from App constructor,
+     *            where App.INSTANCE is not initialized yet.
+     */
     @SuppressWarnings("unchecked")
-    public Page() {
-        messages = (ArrayList<Message>) App.getInstance().getSession().get("messages", new ArrayList<>());
+    Page(App app) {
+        this.app = app;
+        messages = (ArrayList<Message>) app.getSession().get("messages", new ArrayList<>());
     }
 
     public ArrayList<Message> getMessages() {
@@ -52,7 +58,7 @@ public final class Page {
      * Must be called at the end of core.Servlet.process() only.
      */
     void send() {
-        HttpServletResponse servletResponse = App.getInstance().getResponse();
+        HttpServletResponse servletResponse = app.getResponse();
 
         try {
             if (redirection != null) {

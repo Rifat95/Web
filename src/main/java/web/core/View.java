@@ -1,5 +1,6 @@
 package web.core;
 
+import com.mitchellbosecke.pebble.PebbleEngine;
 import com.mitchellbosecke.pebble.error.PebbleException;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -23,13 +24,15 @@ public final class View {
     @Override
     public String toString() {
         App app = App.getInstance();
+        PebbleEngine engine = (PebbleEngine) app.getContext().getAttribute("templateEngine");
+
         data.put("u", Util.getInstance());
         data.put("t", app.getT());
         data.put("messages", app.getPage().getMessages());
 
         try {
             StringWriter sw = new StringWriter();
-            Servlet.getTemplateEngine().getTemplate(template).evaluate(sw, data);
+            engine.getTemplate(template).evaluate(sw, data);
             return sw.toString();
         } catch (PebbleException | IOException e) {
             throw new ServerException(e);

@@ -8,7 +8,7 @@ import javax.servlet.http.HttpSession;
 public final class Session {
     private HttpSession servletSession;
 
-    public Session(HttpSession servletSession) {
+    Session(HttpSession servletSession) {
         this.servletSession = servletSession;
     }
 
@@ -19,12 +19,12 @@ public final class Session {
     public Object get(String attr, Object defaultValue) {
         Object sessionAttr = servletSession.getAttribute(attr);
 
-        if (sessionAttr != null) {
-            return sessionAttr;
-        } else {
+        if (sessionAttr == null) {
+            sessionAttr = defaultValue;
             servletSession.setAttribute(attr, defaultValue);
-            return defaultValue;
         }
+
+        return sessionAttr;
     }
 
     public void set(String attr, Object value) {

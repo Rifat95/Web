@@ -1,17 +1,27 @@
 package web.core;
 
 import java.text.MessageFormat;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ResourceBundle;
 
 public final class Translator {
+    private App app;
+    private HashMap<String, ResourceBundle> i18nBundles;
     private ResourceBundle strings;
     private MessageFormat formatter;
 
-    public Translator() {
-        String defaultLanguage = Servlet.getSetting("default.language");
-        String language = (String) App.getInstance().getSession().get("language", defaultLanguage);
-        strings = Servlet.getLanguagePack(language);
+    /**
+     *
+     * @param app required because this constructor is called from App constructor,
+     *            where App.INSTANCE is not initialized yet.
+     */
+    @SuppressWarnings("unchecked")
+    Translator(App app) {
+        this.app = app;
+        i18nBundles = (HashMap<String, ResourceBundle>) app.getContext().getAttribute("i18nBundles");
+        String language = (String) app.getSession().get("language", app.getSetting("default.language"));
+        strings = i18nBundles.get(language);
         formatter = new MessageFormat("", strings.getLocale());
     }
 
@@ -29,7 +39,7 @@ public final class Translator {
      * Example of use: t.t("str", ["arg1", "arg2"])
      *
      * @param key
-     * @param l the arguments
+     * @param l   the arguments
      * @return the string associated with the key
      */
     public String t(String key, List<Object> l) {
@@ -37,9 +47,10 @@ public final class Translator {
     }
 
     public void setLanguage(String language) {
-        ResourceBundle bundle = Servlet.getLanguagePack(language);
+        ResourceBundle bundle = i18nBundles.get(language);
+
         if (bundle != null) {
-            App.getInstance().getSession().set("language", language);
+            app.getSession().set("language", language);
             strings = bundle;
         }
     }

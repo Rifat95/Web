@@ -13,66 +13,66 @@ import web.util.StringMap;
  * @param <T> the query type, for method chaining
  */
 public abstract class Query<E extends Entity, T extends Query<E, T>> {
-    protected Class<E> entityClass;
-    protected StringMap settings;
-    protected String table;
-    protected String conditions;
-    protected ArrayList<Object> values;
-    protected PreparedStatement statement;
+  protected Class<E> entityClass;
+  protected StringMap settings;
+  protected String table;
+  protected String conditions;
+  protected ArrayList<Object> values;
+  protected PreparedStatement statement;
 
-    private T instance;
+  private T instance;
 
-    @SuppressWarnings("unchecked")
-    public Query(Class<E> entityClass) {
-        this.entityClass = entityClass;
-        table = entityClass.getSimpleName();
-        conditions = "1 = 1";
-        values = new ArrayList<>();
-        instance = (T) this;
+  @SuppressWarnings("unchecked")
+  public Query(Class<E> entityClass) {
+    this.entityClass = entityClass;
+    table = entityClass.getSimpleName();
+    conditions = "1 = 1";
+    values = new ArrayList<>();
+    instance = (T) this;
 
-        try {
-            settings = (StringMap) entityClass.getField("SETTINGS").get(null);
-            if (settings.contains("table")) {
-                table = settings.get("table");
-            }
-        } catch (IllegalAccessException | IllegalArgumentException | NoSuchFieldException | SecurityException e) {
-            settings = new StringMap();
-        }
+    try {
+      settings = (StringMap) entityClass.getField("SETTINGS").get(null);
+      if (settings.contains("table")) {
+        table = settings.get("table");
+      }
+    } catch (IllegalAccessException | IllegalArgumentException | NoSuchFieldException | SecurityException e) {
+      settings = new StringMap();
+    }
+  }
+
+  public final T addCondition(String field, String comparator, Object value) {
+    conditions += " AND `" + field + "` " + comparator + " ?";
+    values.add(value);
+    return instance;
+  }
+
+  protected final void prepareStatemment(String sql) throws SQLException {
+    statement = App.getInstance().getConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+
+    int i = 1;
+    for (Object value : values) {
+      statement.setObject(i, value);
+      i++;
+    }
+  }
+
+  protected final void clean(ResultSet result) {
+    if (result != null) {
+      try {
+        result.close();
+      } catch (SQLException e) {
+        // Ignore
+      }
     }
 
-    public final T addCondition(String field, String comparator, Object value) {
-        conditions += " AND `" + field + "` " + comparator + " ?";
-        values.add(value);
-        return instance;
+    if (statement != null) {
+      try {
+        statement.close();
+      } catch (SQLException e) {
+        // Ignore
+      } finally {
+        statement = null;
+      }
     }
-
-    protected final void prepareStatemment(String sql) throws SQLException {
-        statement = App.getInstance().getConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-
-        int i = 1;
-        for (Object value : values) {
-            statement.setObject(i, value);
-            i++;
-        }
-    }
-
-    protected final void clean(ResultSet result) {
-        if (result != null) {
-            try {
-                result.close();
-            } catch (SQLException e) {
-                // Ignore
-            }
-        }
-
-        if (statement != null) {
-            try {
-                statement.close();
-            } catch (SQLException e) {
-                // Ignore
-            } finally {
-                statement = null;
-            }
-        }
-    }
+  }
 }

@@ -1,9 +1,9 @@
 package web.util;
 
 public final class ForbiddenException extends RuntimeException {
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    public ForbiddenException(String cause) {
-        super(cause);
-    }
+  public ForbiddenException(String cause) {
+    super(cause);
+  }
 }

@@ -5,8 +5,9 @@
 - web.xml
 - settings.properties
 - routes.json
+- Initializer.java
 
-File structure example
+Application file structure
 ```
 Project
 |
@@ -14,8 +15,10 @@ Project
 │   ├── packagename
 │   │   ├── controller
 │   │   │   └── Controller.java
-│   │   └── entity
-│   │       └── Entity.java
+│   │   ├── entity
+│   │   │   └── Entity.java
+│   │   └── init
+│   │       └── Initializer.java
 │   └── resources
 │       ├── conf
 │       │   ├── settings.properties
@@ -71,6 +74,60 @@ database.url = jdbc:mysql://localhost:3306/dbname
 database.user = root
 database.password = root
 database.driver = com.mysql.jdbc.Driver
+```
+
+### Initializer.java example
+```java
+package app.init;
+
+import javax.servlet.ServletContext;
+import web.core.App;
+import web.core.Initializable;
+import web.core.Route;
+import web.core.View;
+import web.util.ForbiddenException;
+import web.util.NotFoundException;
+
+public class Initializer implements Initializable {
+  @Override
+  public void onStart(ServletContext context) {
+    //...
+  }
+
+  @Override
+  public void onRequestStart(App app) {
+    //...
+  }
+
+  @Override
+  public void onRequestFinish(App app) {
+    //...
+  }
+
+  @Override
+  public void handleException(NotFoundException e, App app) {
+    View view = new View("core/error");
+    view.set("code", 404);
+    view.set("message", "Page not found");
+    app.getPage().setResponse(view);
+  }
+
+  @Override
+  public void handleException(ForbiddenException e, App app, Route route) {
+    View view = new View("core/error");
+    view.set("code", 403);
+    view.set("message", "Acces forbidden");
+    app.getPage().setResponse(view);
+  }
+
+  @Override
+  public void handleException(Exception e, App app) {
+    View view = new View("core/error");
+    view.set("code", 500);
+    view.set("message", e.getMessage());
+    app.getPage().setResponse(view);
+  }
+}
 ```
 
 ## How it works

@@ -25,7 +25,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 @WebListener
-public final class Initializer implements ServletContextListener {
+public final class Listener implements ServletContextListener {
   @Override
   public void contextInitialized(ServletContextEvent sce) {
     try {

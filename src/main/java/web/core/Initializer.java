@@ -107,6 +107,13 @@ public final class Initializer implements ServletContextListener {
           .build();
 
       /*
+       * Load application initializer.
+       */
+      @SuppressWarnings("unchecked")
+      Class<Initializable> appInitializerClass = (Class<Initializable>) Class.forName("app.init.Initializer");
+      Initializable appInitializer = appInitializerClass.newInstance();
+
+      /*
        * Save everything in servlet context.
        */
       context.setAttribute("settings", settings);
@@ -114,7 +121,10 @@ public final class Initializer implements ServletContextListener {
       context.setAttribute("i18nBundles", i18nBundles);
       context.setAttribute("dataSource", dataSource);
       context.setAttribute("templateEngine", templateEngine);
-    } catch (IOException | ClassNotFoundException | NoSuchMethodException e) {
+      context.setAttribute("appInitializer", appInitializer);
+
+      appInitializer.onStart(context);
+    } catch (IOException | ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException e) {
       /*
        * Fatal error.
        *

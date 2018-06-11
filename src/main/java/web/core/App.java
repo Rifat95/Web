@@ -92,10 +92,14 @@ public final class App {
   }
 
   void run() {
+    HikariDataSource dataSource = (HikariDataSource) context.getAttribute("dataSource");
+    Initializable appInitializer = (Initializable) context.getAttribute("appInitializer");
+    String token = request.get("tk");
+    Route route = null;
+
     try {
-      Route route = getRoute();
+      route = getRoute();
       String permission = route.getPermission();
-      String token = request.get("tk");
 
       if ((route.hasToken() || request.isPost()) && !token.equals(session.getId())) {
         throw new ForbiddenException("token");
@@ -103,30 +107,31 @@ public final class App {
         throw new ForbiddenException(permission);
       }
 
-      HikariDataSource dataSource = (HikariDataSource) context.getAttribute("dataSource");
       connection = dataSource.getConnection();
+      appInitializer.onRequestStart(this);
       route.getAction().invoke(route.getController().newInstance(), (Object[]) route.getParams());
+      appInitializer.onRequestFinish(this);
     } catch (NotFoundException e) {
       response.setStatus(404);
-      // mainController.handleException(e);
+      appInitializer.handleException(e, this);;
     } catch (ForbiddenException e) {
       response.setStatus(403);
-      // mainController.handleException(e);
+      appInitializer.handleException(e, this, route);
     } catch (InvocationTargetException e) {
       Throwable cause = e.getCause();
 
       if (cause instanceof NotFoundException) {
         response.setStatus(404);
-        // mainController.handleException((NotFoundException) cause);
+        appInitializer.handleException((NotFoundException) cause, this);
       } else if (cause instanceof RedirectionException) {
         page.setRedirection(cause.getMessage());
       } else {
         response.setStatus(500);
-        // mainController.handleException((Exception) cause);
+        appInitializer.handleException((Exception) cause, this);
       }
     } catch (IllegalAccessException | IllegalArgumentException | InstantiationException | SQLException e) {
       response.setStatus(500);
-      // mainController.handleException(e);
+      appInitializer.handleException(e, this);
     } finally {
       page.send();
       clean();

@@ -16,11 +16,14 @@ import java.util.Locale;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 import org.reflections.Reflections;
+import org.reflections.scanners.ResourcesScanner;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
@@ -47,8 +50,8 @@ public final class Listener implements ServletContextListener {
           .addClassLoader(loader)
           .setUrls(ClasspathHelper.forPackage("app.controller", loader))
           .setScanners(new SubTypesScanner());
-
       Reflections reflections = new Reflections(reflectionConfig);
+
       Set<Class<? extends Controller>> controllers = reflections.getSubTypesOf(Controller.class);
       ArrayList<Route> routes = new ArrayList<>();
 
@@ -62,16 +65,25 @@ public final class Listener implements ServletContextListener {
       });
 
       /*
-       * Load application language packs.
-       *
-       * @todo Find supported languages automaticly
+       * Load application language packs by scanning avalaible resources trough reflexion.
        */
-      HashMap<String, ResourceBundle> i18nBundles = new HashMap<>();
-      String[] languages = settings.getProperty("supported.languages").split(",");
+      reflectionConfig = new ConfigurationBuilder()
+          .addClassLoader(loader)
+          .setUrls(ClasspathHelper.forPackage("i18n", loader))
+          .setScanners(new ResourcesScanner());
+      reflections = new Reflections(reflectionConfig);
 
-      for (String language : languages) {
-        i18nBundles.put(language, ResourceBundle.getBundle("i18n.strings", new Locale(language), loader));
-      }
+      Pattern p = Pattern.compile("strings_([a-zA-Z_]+)\\.properties");
+      Set<String> resources = reflections.getResources(p);
+      HashMap<String, ResourceBundle> i18nBundles = new HashMap<>();
+
+      resources.forEach((resource) -> {
+        Matcher m = p.matcher(resource.replace("i18n/", ""));
+        if (m.matches()) {
+          String language = m.group(1);
+          i18nBundles.put(language, ResourceBundle.getBundle("i18n.strings", new Locale(language), loader));
+        }
+      });
 
       /*
        * Load database connections.

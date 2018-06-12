@@ -20,9 +20,10 @@ Project
 │   │       └── Initializer.java
 │   └── resources
 │       ├── conf
-│       │   ├── settings.properties
+│       │   └── settings.properties
 │       └── i18n
-│           └── strings_fr.properties
+│           ├── strings_fr.properties
+│           └── strings_en.properties
 |
 └── web-app-folder
     ├── WEB-INF
@@ -31,8 +32,8 @@ Project
     │   └── templates
     │       ├── core
     │       │   ├── body.tpl
-    │       │   ├── error.tpl
-    │       └── home.tpl
+    │       │   └── error.tpl
+    │       ├── home.tpl
     │       └── login.tpl
     └── public
         ├── css
@@ -65,7 +66,6 @@ Project
 
 ### settings.properties example
 ```properties
-supported.languages = fr,en,es
 default.language = fr
 
 database.url = jdbc:mysql://localhost:3306/dbname

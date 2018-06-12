@@ -1,15 +1,11 @@
 package web.core;
 
 public final class Message {
-  public static final String INFO = "info";
-  public static final String SUCCESS = "success";
-  public static final String WARNING = "warning";
-
   private String type;
   private String content;
 
-  public Message(String type, String content) {
-    this.type = type;
+  public Message(Type type, String content) {
+    this.type = type.toString();
     this.content = content;
   }
 
@@ -19,5 +15,22 @@ public final class Message {
 
   public String getContent() {
     return content;
+  }
+
+  public enum Type {
+    INFO("info"),
+    SUCCESS("success"),
+    WARNING("warning");
+
+    private String value;
+
+    private Type(String value) {
+      this.value = value;
+    }
+
+    @Override
+    public String toString() {
+      return value;
+    }
   }
 }

@@ -36,7 +36,7 @@ public final class Page {
     contentType = "application/json;charset=UTF-8";
   }
 
-  public void addMessage(String type, String content) {
+  public void addMessage(Message.Type type, String content) {
     addMessage(new Message(type, content));
   }
 

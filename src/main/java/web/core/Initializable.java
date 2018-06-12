@@ -5,7 +5,7 @@ import web.util.ForbiddenException;
 import web.util.NotFoundException;
 
 public interface Initializable {
-  public void onStart(ServletContext context);
+  public void onAppStart(ServletContext context);
 
   public void onRequestStart(App app);
 

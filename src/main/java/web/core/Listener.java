@@ -123,7 +123,7 @@ public final class Listener implements ServletContextListener {
       context.setAttribute("templateEngine", templateEngine);
       context.setAttribute("appInitializer", appInitializer);
 
-      appInitializer.onStart(context);
+      appInitializer.onAppStart(context);
     } catch (IOException | ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException e) {
       /*
        * Fatal error.

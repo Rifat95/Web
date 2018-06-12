@@ -4,6 +4,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -113,7 +114,7 @@ public final class App {
       appInitializer.onRequestFinish(this);
     } catch (NotFoundException e) {
       response.setStatus(404);
-      appInitializer.handleException(e, this);;
+      appInitializer.handleException(e, this);
     } catch (ForbiddenException e) {
       response.setStatus(403);
       appInitializer.handleException(e, this, route);
@@ -138,9 +139,10 @@ public final class App {
     }
   }
 
+  @SuppressWarnings("unchecked")
   private Route getRoute() {
     String uri = request.getURI();
-    Route[] routes = (Route[]) context.getAttribute("routes");
+    List<Route> routes = (List<Route>) context.getAttribute("routes");
 
     for (Route r : routes) {
       Matcher m = Pattern.compile(r.getUri()).matcher(uri);

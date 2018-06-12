@@ -4,17 +4,17 @@ import java.lang.reflect.Method;
 
 public final class Route {
   private String uri;
-  private Class<?> controller;
+  private Class<? extends Controller> controller;
   private Method action;
   private String permission;
-  private String[] params;
   private boolean token;
+  private String[] params;
 
-  Route(String uri, Class<?> controller, Method action, String permission, boolean token) {
+  Route(String uri, Class<? extends Controller> controller, Method action, String permission, boolean token) {
     this(uri, controller, action, permission, token, null);
   }
 
-  Route(String uri, Class<?> controller, Method action, String permission, boolean token, String[] params) {
+  Route(String uri, Class<? extends Controller> controller, Method action, String permission, boolean token, String[] params) {
     this.uri = uri;
     this.controller = controller;
     this.action = action;
@@ -27,7 +27,7 @@ public final class Route {
     return uri;
   }
 
-  Class<?> getController() {
+  Class<? extends Controller> getController() {
     return controller;
   }
 

@@ -4,7 +4,6 @@
 
 - web.xml
 - settings.properties
-- routes.json
 - Initializer.java
 
 Application file structure
@@ -22,7 +21,6 @@ Project
 │   └── resources
 │       ├── conf
 │       │   ├── settings.properties
-│       │   └── routes.json
 │       └── i18n
 │           └── strings_fr.properties
 |
@@ -152,68 +150,36 @@ public class Initializer implements Initializable {
 
 ## Help
 
-### Define a route and create a controller
-routes.json example
-```json
-[
-  {
-    "uri": "/",
-    "controller": "Home@show",
-    "permission": "all"
-  },
-  {
-    "uri": "/login",
-    "controller": "Auth@login",
-    "permission": "guest"
-  },
-  {
-    "uri": "/news/([0-9]+)/([a-z0-9-]+)",
-    "controller": "News@show",
-    "permission": "member",
-    "token": true
-  }
-]
-```
+### Create a controller with actions
 
-Controller example for the first route (app.controller.Home)
 ```java
-package app.controller;
-
-import web.core.Controller;
-import web.core.View;
-
-public class Home extends Controller {
-  public void show() {
-    View v = new View("home");
-    v.set("var", t.t("Hello"));
-    v.set("var2", 666);
-
-    page.setResponse(v);
+public class Example extends Controller {
+  @Action(uri = "/", permission = "all")
+  public void home() {
+    View view = new View("home");
+    page.setResponse(view);
   }
-}
-```
 
-Controller example for the third route (app.controller.News)
-```java
-package app.controller;
-
-import web.core.Controller;
-import app.entity.News;
-
-public class News extends Controller {
   /**
-   * Route's regular expression : /news/([0-9]+)/([a-z0-9-]+)
-   *
    * @param id corresponds to the first group of parentheses
    * @param slug corresponds to the second group of parentheses
    */
-  public void show(String id, String slug) {
-    News n = new News(id);
-    View v = new View("news");
-    v.set("news", n);
-    v.set("newsSlug", slug);
+  @Action(uri = "/news/([0-9]+)/([a-z0-9-]+)", permission = "member")
+  public void news(String id, String slug) {
+    News news = new News(id);
 
-    page.setResponse(v);
+    View view = new View("single-news");
+    view.set("news", news);
+    view.set("slug", slug);
+
+    page.setResponse(view);
+  }
+
+  @Action(uri = "/logout", permission = "member", token = true)
+  public void logout() {
+    app.getSession().destroy();
+    page.addMessage(Message.Type.SUCCESS, t.t("user.disconnected"));
+    page.setRedirection(Util.uri("/login"));
   }
 }
 ```

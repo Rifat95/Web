@@ -4,12 +4,12 @@ import com.mitchellbosecke.pebble.PebbleEngine;
 import com.mitchellbosecke.pebble.loader.ServletLoader;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Locale;
@@ -20,9 +20,10 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
-import org.apache.commons.io.FileUtils;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
 
 @WebListener
 public final class Listener implements ServletContextListener {
@@ -40,25 +41,25 @@ public final class Listener implements ServletContextListener {
       settings.put("context.path", context.getContextPath());
 
       /*
-       * Load application routes.
+       * Load application routes by finding controllers trough reflection.
        */
-      File file = new File(loader.getResource("conf/routes.json").getPath());
-      JSONArray routeList = new JSONArray(FileUtils.readFileToString(file, "UTF-8"));
+      ConfigurationBuilder reflectionConfig = new ConfigurationBuilder()
+          .addClassLoader(loader)
+          .setUrls(ClasspathHelper.forPackage("app.controller", loader))
+          .setScanners(new SubTypesScanner());
 
-      int nbRoute = routeList.length();
-      Route[] routes = new Route[nbRoute];
+      Reflections reflections = new Reflections(reflectionConfig);
+      Set<Class<? extends Controller>> controllers = reflections.getSubTypesOf(Controller.class);
+      ArrayList<Route> routes = new ArrayList<>();
 
-      for (int i = 0; i < nbRoute; i++) {
-        JSONObject jo = routeList.getJSONObject(i);
-        String uri = jo.getString("uri");
-        String[] controllerInfos = jo.getString("controller").split("@");
-        String permission = jo.getString("permission");
-        boolean token = jo.has("token") ? jo.getBoolean("token") : false;
-
-        Class<?> controller = Class.forName("app.controller." + controllerInfos[0]);
-        Method action = getMethod(controllerInfos[1], controller);
-        routes[i] = new Route(uri, controller, action, permission, token);
-      }
+      controllers.forEach((controller) -> {
+        for (Method method : controller.getDeclaredMethods()) {
+          if (method.isAnnotationPresent(Action.class)) {
+            Action annotation = method.getDeclaredAnnotation(Action.class);
+            routes.add(new Route(annotation.uri(), controller, method, annotation.permission(), annotation.token()));
+          }
+        }
+      });
 
       /*
        * Load application language packs.
@@ -124,7 +125,7 @@ public final class Listener implements ServletContextListener {
       context.setAttribute("appInitializer", appInitializer);
 
       appInitializer.onAppStart(context);
-    } catch (IOException | ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException e) {
+    } catch (IOException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {
       /*
        * Fatal error.
        *
@@ -170,15 +171,5 @@ public final class Listener implements ServletContextListener {
         }
       }
     }
-  }
-
-  private Method getMethod(String name, Class<?> c) throws NoSuchMethodException {
-    for (Method m : c.getDeclaredMethods()) {
-      if (m.getName().equals(name)) {
-        return m;
-      }
-    }
-
-    throw new NoSuchMethodException();
   }
 }

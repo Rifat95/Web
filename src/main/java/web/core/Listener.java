@@ -37,88 +37,11 @@ public final class Listener implements ServletContextListener {
       ServletContext context = sce.getServletContext();
       ClassLoader loader = context.getClassLoader();
 
-      /*
-       * Load application settings.
-       */
-      Properties settings = new Properties();
-      settings.load(loader.getResourceAsStream("conf/settings.properties"));
-      settings.put("context.path", context.getContextPath());
-
-      /*
-       * Load application routes by finding controllers trough reflection.
-       */
-      ConfigurationBuilder reflectionConfig = new ConfigurationBuilder()
-          .addClassLoader(loader)
-          .setUrls(ClasspathHelper.forPackage("app.controller", loader))
-          .setScanners(new SubTypesScanner());
-      Reflections reflections = new Reflections(reflectionConfig);
-
-      Set<Class<? extends Controller>> controllers = reflections.getSubTypesOf(Controller.class);
-      ArrayList<Route> routes = new ArrayList<>();
-
-      controllers.forEach((controller) -> {
-        for (Method method : controller.getDeclaredMethods()) {
-          if (method.isAnnotationPresent(Action.class)) {
-            Action annotation = method.getDeclaredAnnotation(Action.class);
-            routes.add(new Route(annotation.uri(), controller, method, annotation.permission(), annotation.token()));
-          }
-        }
-      });
-
-      /*
-       * Load application language packs by scanning avalaible resources trough reflexion.
-       */
-      reflectionConfig = new ConfigurationBuilder()
-          .addClassLoader(loader)
-          .setUrls(ClasspathHelper.forPackage("i18n", loader))
-          .setScanners(new ResourcesScanner());
-      reflections = new Reflections(reflectionConfig);
-
-      Pattern p = Pattern.compile("strings_([a-zA-Z_]+)\\.properties");
-      Set<String> resources = reflections.getResources(p);
-      HashMap<String, ResourceBundle> i18nBundles = new HashMap<>();
-
-      resources.forEach((resource) -> {
-        Matcher m = p.matcher(resource.replace("i18n/", ""));
-        if (m.matches()) {
-          String language = m.group(1);
-          i18nBundles.put(language, ResourceBundle.getBundle("i18n.strings", new Locale(language), loader));
-        }
-      });
-
-      /*
-       * Load database connections.
-       */
-      HikariConfig config = new HikariConfig();
-      config.setJdbcUrl(settings.getProperty("database.url"));
-      config.setUsername(settings.getProperty("database.user"));
-      config.setPassword(settings.getProperty("database.password"));
-      config.setDriverClassName(settings.getProperty("database.driver"));
-
-      config.addDataSourceProperty("cachePrepStmts", "true");
-      config.addDataSourceProperty("prepStmtCacheSize", "250");
-      config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
-      config.addDataSourceProperty("useServerPrepStmts", "true");
-      config.addDataSourceProperty("useLocalSessionState", "true");
-      config.addDataSourceProperty("useLocalTransactionState", "true");
-      config.addDataSourceProperty("rewriteBatchedStatements", "true");
-      config.addDataSourceProperty("cacheResultSetMetadata", "true");
-      config.addDataSourceProperty("cacheServerConfiguration", "true");
-      config.addDataSourceProperty("elideSetAutoCommits", "true");
-      config.addDataSourceProperty("maintainTimeStats", "false");
-
-      HikariDataSource dataSource = new HikariDataSource(config);
-
-      /*
-       * Load template engine.
-       */
-      ServletLoader templateLoader = new ServletLoader(context);
-      templateLoader.setPrefix("/WEB-INF/templates/");
-      templateLoader.setSuffix(".tpl");
-      PebbleEngine templateEngine = new PebbleEngine.Builder()
-          .loader(templateLoader)
-          .strictVariables(true)
-          .build();
+      loadSettings(context, loader);
+      loadRoutes(context, loader);
+      loadStrings(context, loader);
+      loadTemplateEngine(context);
+      loadDatasource(context);
 
       /*
        * Load application initializer.
@@ -127,16 +50,7 @@ public final class Listener implements ServletContextListener {
       Class<Initializable> appInitializerClass = (Class<Initializable>) Class.forName("app.init.Initializer");
       Initializable appInitializer = appInitializerClass.newInstance();
 
-      /*
-       * Save everything in servlet context.
-       */
-      context.setAttribute("settings", settings);
-      context.setAttribute("routes", routes);
-      context.setAttribute("i18nBundles", i18nBundles);
-      context.setAttribute("dataSource", dataSource);
-      context.setAttribute("templateEngine", templateEngine);
       context.setAttribute("appInitializer", appInitializer);
-
       appInitializer.onAppStart(context);
     } catch (IOException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {
       /*
@@ -184,5 +98,95 @@ public final class Listener implements ServletContextListener {
         }
       }
     }
+  }
+
+  private void loadSettings(ServletContext context, ClassLoader loader) throws IOException {
+    Properties settings = new Properties();
+    settings.load(loader.getResourceAsStream("conf/settings.properties"));
+    settings.put("context.path", context.getContextPath());
+
+    context.setAttribute("settings", settings);
+  }
+
+  private void loadRoutes(ServletContext context, ClassLoader loader) {
+    ConfigurationBuilder reflectionConfig = new ConfigurationBuilder()
+        .addClassLoader(loader)
+        .setUrls(ClasspathHelper.forPackage("app.controller", loader))
+        .setScanners(new SubTypesScanner());
+    Reflections reflections = new Reflections(reflectionConfig);
+
+    Set<Class<? extends Controller>> controllers = reflections.getSubTypesOf(Controller.class);
+    ArrayList<Route> routes = new ArrayList<>();
+
+    controllers.forEach((controller) -> {
+      for (Method method : controller.getDeclaredMethods()) {
+        if (method.isAnnotationPresent(Action.class)) {
+          Action annotation = method.getDeclaredAnnotation(Action.class);
+          routes.add(new Route(annotation.uri(), controller, method, annotation.permission(), annotation.token()));
+        }
+      }
+    });
+
+    context.setAttribute("routes", routes);
+  }
+
+  private void loadStrings(ServletContext context, ClassLoader loader) {
+    ConfigurationBuilder reflectionConfig = new ConfigurationBuilder()
+        .addClassLoader(loader)
+        .setUrls(ClasspathHelper.forPackage("i18n", loader))
+        .setScanners(new ResourcesScanner());
+    Reflections reflections = new Reflections(reflectionConfig);
+
+    Pattern p = Pattern.compile("strings_([a-zA-Z_]+)\\.properties");
+    Set<String> resources = reflections.getResources(p);
+    HashMap<String, ResourceBundle> i18nBundles = new HashMap<>();
+
+    resources.forEach((resource) -> {
+      Matcher m = p.matcher(resource.replace("i18n/", ""));
+      if (m.matches()) {
+        String language = m.group(1);
+        i18nBundles.put(language, ResourceBundle.getBundle("i18n.strings", new Locale(language), loader));
+      }
+    });
+
+    context.setAttribute("i18nBundles", i18nBundles);
+  }
+
+  private void loadTemplateEngine(ServletContext context) {
+    ServletLoader templateLoader = new ServletLoader(context);
+    templateLoader.setPrefix("/WEB-INF/templates/");
+    templateLoader.setSuffix(".tpl");
+
+    PebbleEngine templateEngine = new PebbleEngine.Builder()
+        .loader(templateLoader)
+        .strictVariables(true)
+        .build();
+
+    context.setAttribute("templateEngine", templateEngine);
+  }
+
+  private void loadDatasource(ServletContext context) {
+    Properties settings = (Properties) context.getAttribute("settings");
+
+    HikariConfig config = new HikariConfig();
+    config.setJdbcUrl(settings.getProperty("database.url"));
+    config.setUsername(settings.getProperty("database.user"));
+    config.setPassword(settings.getProperty("database.password"));
+    config.setDriverClassName(settings.getProperty("database.driver"));
+
+    config.addDataSourceProperty("cachePrepStmts", "true");
+    config.addDataSourceProperty("prepStmtCacheSize", "250");
+    config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
+    config.addDataSourceProperty("useServerPrepStmts", "true");
+    config.addDataSourceProperty("useLocalSessionState", "true");
+    config.addDataSourceProperty("useLocalTransactionState", "true");
+    config.addDataSourceProperty("rewriteBatchedStatements", "true");
+    config.addDataSourceProperty("cacheResultSetMetadata", "true");
+    config.addDataSourceProperty("cacheServerConfiguration", "true");
+    config.addDataSourceProperty("elideSetAutoCommits", "true");
+    config.addDataSourceProperty("maintainTimeStats", "false");
+
+    HikariDataSource dataSource = new HikariDataSource(config);
+    context.setAttribute("dataSource", dataSource);
   }
 }

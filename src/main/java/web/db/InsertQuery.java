@@ -18,9 +18,9 @@ public final class InsertQuery<E extends Entity> extends Query<E, InsertQuery<E>
   }
 
   public InsertQuery<E> set(String field, Object value) {
-    fields += field + ", ";
+    fields += escape(field) + ", ";
     markups += "?, ";
-    values.add(value);
+    statementValues.add(value);
 
     return this;
   }
@@ -34,7 +34,7 @@ public final class InsertQuery<E extends Entity> extends Query<E, InsertQuery<E>
 
     try {
       // Remove the last comma and space from fields and markups
-      prepareStatemment("INSERT INTO `" + table + "`("
+      prepareStatemment("INSERT INTO " + escape(table) + "("
           + fields.substring(0, fields.length() - 2) + ") VALUES ("
           + markups.substring(0, markups.length() - 2) + ")");
 

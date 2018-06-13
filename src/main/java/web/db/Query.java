@@ -1,59 +1,57 @@
 package web.db;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import web.core.App;
-import web.util.StringMap;
 
 /**
  * @param <E> the entity type
  * @param <T> the query type, for method chaining
+ *
+ * @todo Handle table name escaping for all database engines
  */
 public abstract class Query<E extends Entity, T extends Query<E, T>> {
   protected Class<E> entityClass;
-  protected StringMap settings;
+  protected Connection connection;
   protected String table;
   protected String conditions;
-  protected ArrayList<Object> values;
   protected PreparedStatement statement;
+  protected ArrayList<Object> statementValues;
 
   private T instance;
 
   @SuppressWarnings("unchecked")
   public Query(Class<E> entityClass) {
     this.entityClass = entityClass;
+    connection = App.getInstance().getConnection();
     table = entityClass.getSimpleName();
     conditions = "1 = 1";
-    values = new ArrayList<>();
+    statementValues = new ArrayList<>();
     instance = (T) this;
-
-    try {
-      settings = (StringMap) entityClass.getField("SETTINGS").get(null);
-      if (settings.contains("table")) {
-        table = settings.get("table");
-      }
-    } catch (IllegalAccessException | IllegalArgumentException | NoSuchFieldException | SecurityException e) {
-      settings = new StringMap();
-    }
   }
 
-  public final T addCondition(String field, String comparator, Object value) {
-    conditions += " AND `" + field + "` " + comparator + " ?";
-    values.add(value);
+  public final T where(String field, String comparator, Object value) {
+    conditions += " AND " + escape(field) + " " + comparator + " ?";
+    statementValues.add(value);
     return instance;
   }
 
   protected final void prepareStatemment(String sql) throws SQLException {
-    statement = App.getInstance().getConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+    statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
     int i = 1;
-    for (Object value : values) {
+    for (Object value : statementValues) {
       statement.setObject(i, value);
       i++;
     }
+  }
+
+  protected final String escape(String str) {
+    return "`" + str + "`";
   }
 
   protected final void clean(ResultSet result) {

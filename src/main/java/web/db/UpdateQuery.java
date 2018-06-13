@@ -15,15 +15,15 @@ public final class UpdateQuery<E extends Entity> extends Query<E, UpdateQuery<E>
   }
 
   public UpdateQuery<E> set(String field, Object value) {
-    fields += " " + field + " = ?,";
-    values.add(value);
+    fields += " " + escape(field) + " = ?,";
+    statementValues.add(value);
     return this;
   }
 
   public void execute() {
     try {
       // Remove the last comma from fields
-      prepareStatemment("UPDATE `" + table + "` SET" + fields.substring(0, fields.length() - 1)
+      prepareStatemment("UPDATE " + escape(table) + " SET" + fields.substring(0, fields.length() - 1)
           + " WHERE " + conditions);
 
       statement.executeUpdate();

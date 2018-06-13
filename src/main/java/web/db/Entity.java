@@ -6,13 +6,6 @@ import java.util.HashMap;
 import web.core.App;
 import web.core.Translator;
 
-/**
- * Children can define a StringMap to alter queries, example:
- * public static final StringMap SETTINGS = new StringMap()
- * .put("conditions", "WHERE status = 'published' AND amount > 0")
- * .put("joins", "LEFT JOIN User ON User.id = EntityX.authorId")
- * .put("order", "EntityX.releaseDate DESC");
- */
 public abstract class Entity {
   protected App app;
   protected Translator t;
@@ -26,15 +19,15 @@ public abstract class Entity {
     dataToSave = new HashMap<>();
   }
 
-  public final void fetch(int id) {
+  public final void get(int id) {
     new SelectQuery<>(getClass())
-        .addCondition("id", "=", id)
+        .where("id", "=", id)
         .fill(this);
   }
 
   public final void delete() {
     new DeleteQuery<>(getClass())
-        .addCondition("id", "=", id)
+        .where("id", "=", id)
         .execute();
   }
 
@@ -55,7 +48,7 @@ public abstract class Entity {
         uQuery.set(entry.getKey(), entry.getValue());
       });
 
-      uQuery.addCondition("id", "=", id).execute();
+      uQuery.where("id", "=", id).execute();
     } else { // Insert
       InsertQuery<?> iQuery = new InsertQuery<>(getClass());
       dataToSave.entrySet().forEach((entry) -> {

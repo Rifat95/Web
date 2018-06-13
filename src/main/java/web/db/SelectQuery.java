@@ -23,65 +23,39 @@ public final class SelectQuery<E extends Entity> extends Query<E, SelectQuery<E>
     groupBy = "";
     order = "";
     limit = "";
-
-    if (!settings.isEmpty()) {
-      if (settings.contains("fields")) {
-        fields = settings.get("fields");
-      }
-      if (settings.contains("conditions")) {
-        conditions = settings.get("conditions");
-      }
-      if (settings.contains("joins")) {
-        joins = " " + settings.get("joins");
-      }
-      if (settings.contains("groupBy")) {
-        groupBy = " " + settings.get("groupBy");
-      }
-      if (settings.contains("order")) {
-        order = " " + settings.get("order");
-      }
-      if (settings.contains("limit")) {
-        limit = " " + settings.get("limit");
-      }
-    }
   }
 
-  public SelectQuery<E> setFields(String fields) {
+  public SelectQuery<E> fields(String fields) {
     this.fields = fields;
     return this;
   }
 
-  public SelectQuery<E> addInerJoin(String table, String tableField, String localField) {
-    joins += " INNER JOIN " + table + " ON " + table + "." + tableField + " = " + this.table
-        + "." + localField;
-
+  public SelectQuery<E> inerJoin(String table, String tableField, String localField) {
+    join("INNER JOIN", table, tableField, localField);
     return this;
   }
 
-  public SelectQuery<E> addLeftJoin(String table, String tableField, String localField) {
-    joins += " LEFT JOIN " + table + " ON " + table + "." + tableField + " = " + this.table
-        + "." + localField;
-
+  public SelectQuery<E> leftJoin(String table, String tableField, String localField) {
+    join("LEFT JOIN", table, tableField, localField);
     return this;
   }
 
-  public SelectQuery<E> addRightJoin(String table, String tableField, String localField) {
-    joins += " RIGHT JOIN " + table + " ON " + table + "." + tableField + " = " + this.table
-        + "." + localField;
+  public SelectQuery<E> rightJoin(String table, String tableField, String localField) {
+    join("RIGHT JOIN", table, tableField, localField);
     return this;
   }
 
-  public SelectQuery<E> setGroupBy(String fields) {
+  public SelectQuery<E> groupBy(String fields) {
     groupBy = " GROUP BY " + fields;
     return this;
   }
 
-  public SelectQuery<E> setOrder(String fields) {
+  public SelectQuery<E> order(String fields) {
     order = " ORDER BY " + fields;
     return this;
   }
 
-  public SelectQuery<E> setLimit(int start, int nbEntry) {
+  public SelectQuery<E> limit(int start, int nbEntry) {
     limit = " LIMIT " + start + " OFFSET " + nbEntry;
     return this;
   }
@@ -172,8 +146,13 @@ public final class SelectQuery<E extends Entity> extends Query<E, SelectQuery<E>
     return entities;
   }
 
+  private void join(String type, String table, String tableField, String localField) {
+    joins += " " + type + " " + escape(table) + " ON " + escape(table) + "." + escape(tableField)
+        + " = " + escape(this.table) + "." + escape(localField);
+  }
+
   private ResultSet getResultSet() throws SQLException {
-    prepareStatemment("SELECT " + fields + " FROM `" + table + "`" + joins + " WHERE " + conditions
+    prepareStatemment("SELECT " + fields + " FROM " + escape(table) + joins + " WHERE " + conditions
         + groupBy + order + limit);
 
     return statement.executeQuery();

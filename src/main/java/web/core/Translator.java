@@ -1,13 +1,13 @@
 package web.core;
 
 import java.text.MessageFormat;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 public final class Translator {
   private App app;
-  private HashMap<String, ResourceBundle> i18nBundles;
+  private Map<String, ResourceBundle> i18nBundles;
   private ResourceBundle strings;
   private MessageFormat formatter;
 
@@ -18,7 +18,7 @@ public final class Translator {
   @SuppressWarnings("unchecked")
   Translator(App app) {
     this.app = app;
-    i18nBundles = (HashMap<String, ResourceBundle>) app.getContext().getAttribute("i18nBundles");
+    i18nBundles = (Map<String, ResourceBundle>) app.getContext().getAttribute("i18nBundles");
     String language = (String) app.getSession().get("language", app.getSetting("default.language"));
     strings = i18nBundles.get(language);
     formatter = new MessageFormat("", strings.getLocale());

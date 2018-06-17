@@ -12,7 +12,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -116,7 +118,7 @@ public final class Listener implements ServletContextListener {
     Reflections reflections = new Reflections(reflectionConfig);
 
     Set<Class<? extends Controller>> controllers = reflections.getSubTypesOf(Controller.class);
-    ArrayList<Route> routes = new ArrayList<>();
+    List<Route> routes = new ArrayList<>();
 
     controllers.forEach((controller) -> {
       for (Method method : controller.getDeclaredMethods()) {
@@ -139,7 +141,7 @@ public final class Listener implements ServletContextListener {
 
     Pattern p = Pattern.compile("strings_([a-zA-Z_]+)\\.properties");
     Set<String> resources = reflections.getResources(p);
-    HashMap<String, ResourceBundle> i18nBundles = new HashMap<>();
+    Map<String, ResourceBundle> i18nBundles = new HashMap<>();
 
     resources.forEach((resource) -> {
       Matcher m = p.matcher(resource.replace("i18n/", ""));

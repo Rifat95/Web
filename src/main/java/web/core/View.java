@@ -5,12 +5,13 @@ import com.mitchellbosecke.pebble.error.PebbleException;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.HashMap;
+import java.util.Map;
 import web.util.ServerException;
 import web.util.Util;
 
 public final class View {
   private String template;
-  private HashMap<String, Object> data;
+  private Map<String, Object> data;
 
   public View(String name) {
     template = name;

@@ -2,6 +2,7 @@ package web.core;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 import org.json.JSONObject;
 
@@ -10,7 +11,7 @@ public final class Page {
   private Object response;
   private String contentType;
   private String redirection;
-  private ArrayList<Message> messages;
+  private List<Message> messages;
 
   /**
    * @param app required because this constructor is called from App constructor,
@@ -19,10 +20,10 @@ public final class Page {
   @SuppressWarnings("unchecked")
   Page(App app) {
     this.app = app;
-    messages = (ArrayList<Message>) app.getSession().get("messages", new ArrayList<>());
+    messages = (List<Message>) app.getSession().get("messages", new ArrayList<>());
   }
 
-  public ArrayList<Message> getMessages() {
+  public List<Message> getMessages() {
     return messages;
   }
 

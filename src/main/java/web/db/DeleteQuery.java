@@ -3,12 +3,9 @@ package web.db;
 import java.sql.SQLException;
 import web.util.ServerException;
 
-/**
- * @param <E> the entity type
- */
-public final class DeleteQuery<E extends Entity> extends Query<E, DeleteQuery<E>> {
-  public DeleteQuery(Class<E> entityClass) {
-    super(entityClass);
+public final class DeleteQuery extends Query<DeleteQuery> {
+  public DeleteQuery(String table) {
+    super(table);
   }
 
   public void execute() {

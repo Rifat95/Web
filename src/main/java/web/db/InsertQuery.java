@@ -4,29 +4,25 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import web.util.ServerException;
 
-/**
- * @param <E> the entity type
- */
-public final class InsertQuery<E extends Entity> extends Query<E, InsertQuery<E>> {
+public final class InsertQuery extends Query<InsertQuery> {
   private String fields;
   private String markups;
 
-  public InsertQuery(Class<E> entityClass) {
-    super(entityClass);
+  public InsertQuery(String table) {
+    super(table);
     fields = "";
     markups = "";
   }
 
-  public InsertQuery<E> set(String field, Object value) {
+  public InsertQuery set(String field, Object value) {
     fields += escape(field) + ", ";
     markups += "?, ";
     statementValues.add(value);
-
     return this;
   }
 
   /**
-   * @return the inserted id
+   * @return the generated key
    */
   public int execute() {
     ResultSet result = null;

@@ -3,18 +3,15 @@ package web.db;
 import java.sql.SQLException;
 import web.util.ServerException;
 
-/**
- * @param <E> the entity type
- */
-public final class UpdateQuery<E extends Entity> extends Query<E, UpdateQuery<E>> {
+public final class UpdateQuery extends Query<UpdateQuery> {
   private String fields;
 
-  public UpdateQuery(Class<E> entityClass) {
-    super(entityClass);
+  public UpdateQuery(String table) {
+    super(table);
     fields = "";
   }
 
-  public UpdateQuery<E> set(String field, Object value) {
+  public UpdateQuery set(String field, Object value) {
     fields += " " + escape(field) + " = ?,";
     statementValues.add(value);
     return this;

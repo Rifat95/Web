@@ -45,9 +45,7 @@ public final class Listener implements ServletContextListener {
       loadTemplateEngine(context);
       loadDatasource(context);
 
-      /*
-       * Load application initializer.
-       */
+      // Load application initializer
       @SuppressWarnings("unchecked")
       Class<Initializable> appInitializerClass = (Class<Initializable>) Class.forName("app.init.Initializer");
       Initializable appInitializer = appInitializerClass.newInstance();
@@ -55,20 +53,15 @@ public final class Listener implements ServletContextListener {
       context.setAttribute("appInitializer", appInitializer);
       appInitializer.onAppStart(context);
     } catch (IOException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-      /*
-       * Fatal error.
-       *
-       * @todo Replace with logger
-       */
+      // Fatal error
+      // @todo Replace with logger
       e.printStackTrace();
     }
   }
 
   @Override
   public void contextDestroyed(ServletContextEvent sce) {
-    /*
-     * Close data source.
-     */
+    // Close data source
     ServletContext context = sce.getServletContext();
     HikariDataSource dataSource = (HikariDataSource) context.getAttribute("dataSource");
 
@@ -76,9 +69,7 @@ public final class Listener implements ServletContextListener {
       dataSource.close();
     }
 
-    /*
-     * Tomcat databse connection issue fix, taken from Stackoverflow.
-     */
+    // Tomcat databse connection issue fix, taken from Stackoverflow
     Enumeration<Driver> drivers = DriverManager.getDrivers();
 
     while (drivers.hasMoreElements()) {

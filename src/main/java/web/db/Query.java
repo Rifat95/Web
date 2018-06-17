@@ -6,38 +6,33 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.List;
 import web.core.App;
 
 /**
- * @param <E> the entity type
- * @param <T> the query type, for method chaining
+ * @param <T> the query type for method chaining
  *
  * @todo Handle table name escaping for all database engines
  */
-public abstract class Query<E extends Entity, T extends Query<E, T>> {
-  protected Class<E> entityClass;
-  protected Connection connection;
+public abstract class Query<T extends Query<T>> {
   protected String table;
-  protected String conditions;
+  protected Connection connection;
   protected PreparedStatement statement;
-  protected ArrayList<Object> statementValues;
+  protected List<Object> statementValues;
+  protected String conditions;
 
-  private T instance;
-
-  @SuppressWarnings("unchecked")
-  public Query(Class<E> entityClass) {
-    this.entityClass = entityClass;
+  public Query(String table) {
+    this.table = table;
     connection = App.getInstance().getConnection();
-    table = entityClass.getSimpleName();
-    conditions = "1 = 1";
     statementValues = new ArrayList<>();
-    instance = (T) this;
+    conditions = "1 = 1";
   }
 
+  @SuppressWarnings("unchecked")
   public final T where(String field, String comparator, Object value) {
     conditions += " AND " + escape(field) + " " + comparator + " ?";
     statementValues.add(value);
-    return instance;
+    return (T) this;
   }
 
   protected final void prepareStatemment(String sql) throws SQLException {

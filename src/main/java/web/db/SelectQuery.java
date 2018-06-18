@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import web.util.NotFoundException;
-import web.util.ServerException;
+import web.exception.NotFoundException;
+import web.exception.ServerException;
 
 /**
  * @todo Handle default joins, sort, groupBy etc with annoations in entities

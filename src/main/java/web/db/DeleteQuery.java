@@ -1,7 +1,7 @@
 package web.db;
 
 import java.sql.SQLException;
-import web.util.ServerException;
+import web.exception.ServerException;
 
 public final class DeleteQuery extends Query<DeleteQuery> {
   public DeleteQuery(String table) {

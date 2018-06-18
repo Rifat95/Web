@@ -1,7 +1,7 @@
 package web.db;
 
 import java.sql.SQLException;
-import web.util.ServerException;
+import web.exception.ServerException;
 
 public final class UpdateQuery extends Query<UpdateQuery> {
   private String fields;

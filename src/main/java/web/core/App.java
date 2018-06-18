@@ -9,9 +9,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import web.util.ForbiddenException;
-import web.util.NotFoundException;
-import web.util.RedirectionException;
+import web.exception.ForbiddenException;
+import web.exception.NotFoundException;
+import web.exception.RedirectionException;
 
 /**
  * Thread local singleton

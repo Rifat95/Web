@@ -1,22 +1,10 @@
-package web.util;
-
-import web.core.App;
-import web.core.Servlet;
+package web.core;
 
 /**
  * Static singleton class
  */
 public final class Util {
   private static final Util INSTANCE = new Util();
-
-  /**
-   * Only to pass the class instance to templates in core.View.toString().
-   *
-   * @return static class instance
-   */
-  public static Util getInstance() {
-    return INSTANCE;
-  }
 
   /**
    * @param path the absolute path
@@ -45,6 +33,15 @@ public final class Util {
    */
   public static String getToken() {
     return App.getInstance().getSession().getId();
+  }
+
+  /**
+   * Only to pass the class instance to templates in core.View.toString().
+   *
+   * @return static class instance
+   */
+  static Util getInstance() {
+    return INSTANCE;
   }
 
   private Util() {

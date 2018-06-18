@@ -6,29 +6,35 @@ import web.annotations.Table;
 import web.core.App;
 import web.core.Translator;
 
-@Table(name = "", primaryKeys = "")
+@Table(name = "", primaryKeys = {})
 public abstract class Entity {
   protected App app;
   protected Translator t;
   protected Map<String, Object> data;
 
+  private boolean isNew;
   private String table;
   private String[] primaryKeys;
-  private boolean isNew;
 
   public Entity() {
     app = App.getInstance();
     t = app.getT();
     data = new HashMap<>();
-
-    Table tableInfos = getClass().getAnnotation(Table.class);
-    table = tableInfos.name();
-    primaryKeys = tableInfos.primaryKeys();
     isNew = true;
+
+    Table annotation = getClass().getAnnotation(Table.class);
+    table = annotation.name();
+    primaryKeys = annotation.primaryKeys();
   }
 
   public final Object get(String attribute) {
     return data.get(attribute);
+  }
+
+  @SuppressWarnings("unchecked")
+  public <T extends Entity> T set(String attribute, Object value) {
+    data.put(attribute, value);
+    return (T) this;
   }
 
   /**
@@ -44,7 +50,7 @@ public abstract class Entity {
 
       int generatedKey = iQuery.execute();
       if (generatedKey != 0) {
-        data.put(primaryKeys[0], generatedKey); // If generated key exists there should be only one primary key
+        data.put(primaryKeys[0], generatedKey); // If generated key exists it should be the first primary key
       }
     } else {
       // Update

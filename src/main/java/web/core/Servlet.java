@@ -15,11 +15,11 @@ public final class Servlet extends HttpServlet {
   private static ServletContext context;
   private static Properties settings;
 
-  public static Object getAttribute(String name) {
+  static Object getAttribute(String name) {
     return context.getAttribute(name);
   }
 
-  public static String getSetting(String name) {
+  static String getSetting(String name) {
     return settings.getProperty(name);
   }
 

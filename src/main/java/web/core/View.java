@@ -6,8 +6,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
-import web.util.ServerException;
-import web.util.Util;
+import web.exception.ServerException;
 
 public final class View {
   private String template;

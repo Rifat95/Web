@@ -1,8 +1,8 @@
 package web.core;
 
 import javax.servlet.ServletContext;
-import web.util.ForbiddenException;
-import web.util.NotFoundException;
+import web.exception.ForbiddenException;
+import web.exception.NotFoundException;
 
 public interface Initializable {
   public void onAppStart(ServletContext context);

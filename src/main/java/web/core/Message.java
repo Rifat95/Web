@@ -5,7 +5,7 @@ public final class Message {
   private String content;
 
   public Message(Type type, String content) {
-    this.type = type.toString();
+    this.type = type.value();
     this.content = content;
   }
 
@@ -28,8 +28,7 @@ public final class Message {
       this.value = value;
     }
 
-    @Override
-    public String toString() {
+    public String value() {
       return value;
     }
   }

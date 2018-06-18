@@ -6,8 +6,6 @@ import java.util.Map;
 import java.util.ResourceBundle;
 
 public final class Translator {
-  private App app;
-  private Map<String, ResourceBundle> i18nBundles;
   private ResourceBundle strings;
   private MessageFormat formatter;
 
@@ -17,9 +15,8 @@ public final class Translator {
    */
   @SuppressWarnings("unchecked")
   Translator(App app) {
-    this.app = app;
-    i18nBundles = (Map<String, ResourceBundle>) app.getContext().getAttribute("i18nBundles");
-    String language = (String) app.getSession().get("language", app.getSetting("default.language"));
+    Map<String, ResourceBundle> i18nBundles = (Map<String, ResourceBundle>) Servlet.getAttribute("i18nBundles");
+    String language = (String) app.getSession().get("language", Servlet.getSetting("default.language"));
     strings = i18nBundles.get(language);
     formatter = new MessageFormat("", strings.getLocale());
   }
@@ -46,11 +43,13 @@ public final class Translator {
     return t(key, l.toArray());
   }
 
+  @SuppressWarnings("unchecked")
   public void setLanguage(String language) {
+    Map<String, ResourceBundle> i18nBundles = (Map<String, ResourceBundle>) Servlet.getAttribute("i18nBundles");
     ResourceBundle bundle = i18nBundles.get(language);
 
     if (bundle != null) {
-      app.getSession().set("language", language);
+      App.getInstance().getSession().set("language", language);
       strings = bundle;
     }
   }

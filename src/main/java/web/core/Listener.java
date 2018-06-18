@@ -49,8 +49,9 @@ public final class Listener implements ServletContextListener {
       @SuppressWarnings("unchecked")
       Class<Initializable> appInitializerClass = (Class<Initializable>) Class.forName("app.init.Initializer");
       Initializable appInitializer = appInitializerClass.newInstance();
-
       context.setAttribute("appInitializer", appInitializer);
+
+      context.setAttribute("contextPath", context.getContextPath());
       appInitializer.onAppStart(context);
     } catch (IOException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {
       // Fatal error
@@ -96,8 +97,6 @@ public final class Listener implements ServletContextListener {
   private void loadSettings(ServletContext context, ClassLoader loader) throws IOException {
     Properties settings = new Properties();
     settings.load(loader.getResourceAsStream("conf/settings.properties"));
-    settings.put("context.path", context.getContextPath());
-
     context.setAttribute("settings", settings);
   }
 
@@ -106,8 +105,8 @@ public final class Listener implements ServletContextListener {
         .addClassLoader(loader)
         .setUrls(ClasspathHelper.forPackage("app.controller", loader))
         .setScanners(new SubTypesScanner());
-    Reflections reflections = new Reflections(reflectionConfig);
 
+    Reflections reflections = new Reflections(reflectionConfig);
     Set<Class<? extends Controller>> controllers = reflections.getSubTypesOf(Controller.class);
     List<Route> routes = new ArrayList<>();
 
@@ -128,8 +127,8 @@ public final class Listener implements ServletContextListener {
         .addClassLoader(loader)
         .setUrls(ClasspathHelper.forPackage("i18n", loader))
         .setScanners(new ResourcesScanner());
-    Reflections reflections = new Reflections(reflectionConfig);
 
+    Reflections reflections = new Reflections(reflectionConfig);
     Pattern p = Pattern.compile("strings_([a-zA-Z_]+)\\.properties");
     Set<String> resources = reflections.getResources(p);
     Map<String, ResourceBundle> i18nBundles = new HashMap<>();

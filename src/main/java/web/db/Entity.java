@@ -27,8 +27,8 @@ public abstract class Entity {
     isNew = true;
   }
 
-  public final Object get(String attr) {
-    return data.get(attr);
+  public final Object get(String attribute) {
+    return data.get(attribute);
   }
 
   /**
@@ -36,6 +36,17 @@ public abstract class Entity {
    */
   public final void save() {
     if (isNew) {
+      // Insert
+      InsertQuery iQuery = new InsertQuery(table);
+      data.entrySet().forEach((entry) -> {
+        iQuery.set(entry.getKey(), entry.getValue());
+      });
+
+      int generatedKey = iQuery.execute();
+      if (generatedKey != 0) {
+        data.put(primaryKeys[0], generatedKey); // If generated key exists there should be only one primary key
+      }
+    } else {
       // Update
       UpdateQuery uQuery = new UpdateQuery(table);
       data.entrySet().forEach((entry) -> {
@@ -47,17 +58,6 @@ public abstract class Entity {
       }
 
       uQuery.execute();
-    } else {
-      // Insert
-      InsertQuery iQuery = new InsertQuery(table);
-      data.entrySet().forEach((entry) -> {
-        iQuery.set(entry.getKey(), entry.getValue());
-      });
-
-      int generatedKey = iQuery.execute();
-      if (generatedKey != 0) {
-        data.put(primaryKeys[0], generatedKey); // If generated key exists there should be only one primary key
-      }
     }
   }
 

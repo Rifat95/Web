@@ -5,10 +5,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import web.util.ForbiddenException;
@@ -21,8 +19,6 @@ import web.util.RedirectionException;
 public final class App {
   private static final ThreadLocal<App> INSTANCE = new ThreadLocal<>();
 
-  private ServletContext context;
-  private Properties settings;
   private Request request;
   private HttpServletResponse response;
   private Session session;
@@ -46,18 +42,12 @@ public final class App {
   }
 
   private App(HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
-    context = servletRequest.getServletContext();
-    settings = (Properties) context.getAttribute("settings");
-    request = new Request(this, servletRequest);
+    request = new Request(servletRequest);
     response = servletResponse;
     session = new Session(servletRequest.getSession());
     user = (AppUser) session.get("appUser", new AppUser());
     page = new Page(this);
     t = new Translator(this);
-  }
-
-  public String getSetting(String name) {
-    return settings.getProperty(name);
   }
 
   public Request getRequest() {
@@ -84,17 +74,13 @@ public final class App {
     return connection;
   }
 
-  ServletContext getContext() {
-    return context;
-  }
-
   HttpServletResponse getResponse() {
     return response;
   }
 
   void run() {
-    HikariDataSource dataSource = (HikariDataSource) context.getAttribute("dataSource");
-    Initializable appInitializer = (Initializable) context.getAttribute("appInitializer");
+    HikariDataSource dataSource = (HikariDataSource) Servlet.getAttribute("dataSource");
+    Initializable appInitializer = (Initializable) Servlet.getAttribute("appInitializer");
     String token = request.get("tk");
     Route route = null;
 
@@ -141,8 +127,8 @@ public final class App {
 
   @SuppressWarnings("unchecked")
   private Route getRoute() {
-    String uri = request.getURI();
-    List<Route> routes = (List<Route>) context.getAttribute("routes");
+    String uri = request.getUri();
+    List<Route> routes = (List<Route>) Servlet.getAttribute("routes");
 
     for (Route r : routes) {
       Matcher m = Pattern.compile(r.getUri()).matcher(uri);

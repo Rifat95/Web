@@ -12,23 +12,23 @@ public final class Session {
     this.servletSession = servletSession;
   }
 
-  public Object get(String attr) {
-    return servletSession.getAttribute(attr);
+  public Object get(String attribute) {
+    return servletSession.getAttribute(attribute);
   }
 
-  public Object get(String attr, Object defaultValue) {
-    Object sessionAttr = servletSession.getAttribute(attr);
+  public Object get(String attribute, Object defaultValue) {
+    Object sessionAttr = servletSession.getAttribute(attribute);
 
     if (sessionAttr == null) {
       sessionAttr = defaultValue;
-      servletSession.setAttribute(attr, defaultValue);
+      servletSession.setAttribute(attribute, defaultValue);
     }
 
     return sessionAttr;
   }
 
-  public void set(String attr, Object value) {
-    servletSession.setAttribute(attr, value);
+  public void set(String attribute, Object value) {
+    servletSession.setAttribute(attribute, value);
   }
 
   public String getId() {

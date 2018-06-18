@@ -6,21 +6,17 @@ import javax.servlet.http.HttpServletRequest;
  * HttpServletRequest wrapper class
  */
 public final class Request {
-  private App app;
   private HttpServletRequest servletRequest;
+  private String uri;
 
-  /**
-   * @param app required because this constructor is called from App constructor,
-   * where App.INSTANCE is not initialized yet.
-   * @param servletRequest
-   */
-  Request(App app, HttpServletRequest servletRequest) {
-    this.app = app;
+  Request(HttpServletRequest servletRequest) {
     this.servletRequest = servletRequest;
+    String contextPath = (String) Servlet.getAttribute("contextPath");
+    uri = servletRequest.getRequestURI().substring(contextPath.length());
   }
 
-  public String getURI() {
-    return servletRequest.getRequestURI().substring(app.getSetting("context.path").length());
+  public String getUri() {
+    return uri;
   }
 
   public String get(String param) {

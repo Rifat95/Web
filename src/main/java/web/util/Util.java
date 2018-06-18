@@ -1,6 +1,7 @@
 package web.util;
 
 import web.core.App;
+import web.core.Servlet;
 
 /**
  * Static singleton class
@@ -23,7 +24,7 @@ public final class Util {
    * @return web context + path
    */
   public static String uri(String path) {
-    return App.getInstance().getSetting("context.path") + path;
+    return Servlet.getAttribute("contextPath") + path;
   }
 
   /**

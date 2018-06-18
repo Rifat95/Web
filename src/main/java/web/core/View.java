@@ -18,14 +18,15 @@ public final class View {
     data = new HashMap<>();
   }
 
-  public void set(String var, Object value) {
-    data.put(var, value);
+  public View set(String attribute, Object value) {
+    data.put(attribute, value);
+    return this;
   }
 
   @Override
   public String toString() {
     App app = App.getInstance();
-    PebbleEngine engine = (PebbleEngine) app.getContext().getAttribute("templateEngine");
+    PebbleEngine engine = (PebbleEngine) Servlet.getAttribute("templateEngine");
 
     data.put("u", Util.getInstance());
     data.put("t", app.getT());

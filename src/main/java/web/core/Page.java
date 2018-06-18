@@ -7,7 +7,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.json.JSONObject;
 
 public final class Page {
-  private App app;
   private Object response;
   private String contentType;
   private String redirection;
@@ -19,7 +18,6 @@ public final class Page {
    */
   @SuppressWarnings("unchecked")
   Page(App app) {
-    this.app = app;
     messages = (List<Message>) app.getSession().get("messages", new ArrayList<>());
   }
 
@@ -59,7 +57,7 @@ public final class Page {
    * Must be called at the end of core.App.run() only.
    */
   void send() {
-    HttpServletResponse servletResponse = app.getResponse();
+    HttpServletResponse servletResponse = App.getInstance().getResponse();
 
     try {
       if (redirection != null) {
